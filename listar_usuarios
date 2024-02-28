@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listar Usuários</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="listar-usuarios-container">
+        <h2>Listar Usuários</h2>
+        <input type="text" placeholder="Pesquisar usuário">
+        <button>Buscar</button>
+        <button onclick="location.href='cadastro.html'">+</button>
+        <!-- Adicionar a lista -->
+    </div>
+</body>
+</html>
