@@ -1,0 +1,64 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 24px;
+}
+
+nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline;
+    margin-left: 20px;
+}
+
+nav ul li a {
+    color: #fff;
+    text-decoration: none;
+}
+.listar-usuarios-container {
+    margin: 20px ;
+    width: 70%;
+    text-align: center;
+}
+
+.pesquisa{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    gap: 10px;
+}
+
+.listarUsuario{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.tabela{
+    margin-top: 30px;
+}
+
+.pesquisa button{
+    height: 50px;
+    width: 80px;
+}
+
+.listarUsuario h1{
+    font-family: "Bebas Neue", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 50px;
+}

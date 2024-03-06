@@ -8,6 +8,6 @@ app.use(express.json());
 
 app.use(cors());
 app.use(usuarioRotas)
-app.listen(3001, () => {
-    console.log("Servidor rodando em http://localhost:3001/");
+app.listen(3005, () => {
+    console.log("Servidor rodando em http://localhost:3005/");
 });
