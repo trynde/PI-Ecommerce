@@ -18,7 +18,7 @@ rotas.post('/login', (req, res) => {
   }
 
   // Consulta o banco de dados para obter os dados do usuário associado ao email fornecido
-  const query = 'SELECT id, grupo, senha FROM usuarios WHERE email = ?';
+  const query = 'SELECT id, grupo, situacao, senha FROM usuarios WHERE email = ?';
   connection.query(query, [email], (err, results) => {
     if (err) {
       console.error('Erro ao executar a consulta:', err);
@@ -28,8 +28,7 @@ rotas.post('/login', (req, res) => {
     if (results.length === 0) {
       return res.status(401).json({ mensagem: 'Credenciais inválidas' });
     }
-
-    const { id, grupo, senha: hashSenha } = results[0];
+    const { id, situacao, grupo, senha: hashSenha } = results[0];
 
     // Compara a senha fornecida pelo usuário com a senha criptografada armazenada no banco de dados
     bcrypt.compare(senha, hashSenha, (err, result) => {
@@ -40,7 +39,7 @@ rotas.post('/login', (req, res) => {
 
       if (result) {
         // Senha correta
-        res.status(200).json({ mensagem: 'Login bem-sucedido', id, grupo });
+        res.status(200).json({ mensagem: 'Login bem-sucedido', id, grupo, situacao });
       } else {
         // Senha incorreta
         res.status(401).json({ mensagem: 'Credenciais inválidas' });
@@ -114,6 +113,29 @@ rotas.post('/usuarios', async (req, res) => {
       res.status(200).json({ mensagem: 'Usuário atualizado com sucesso' });
     });
   });
+
+  rotas.put('/usuarios/:id/situacao', async (req, res) => {
+    const { id } = req.params;
+    const { situacao } = req.body;
+
+    // Verificar se a situação fornecida é válida
+    if (!situacao) {
+        return res.status(400).json({ mensagem: "A situação não foi fornecida." });
+    }
+
+    // Atualizar a situação do usuário no banco de dados
+    connection.query('UPDATE usuarios SET situacao = ? WHERE id = ?', [situacao, id], (error, results) => {
+        if (error) {
+            console.error('Erro ao atualizar situação:', error);
+            return res.status(500).json({ mensagem: 'Erro ao atualizar situação.' });
+        }
+        if (results.affectedRows === 0) {
+            return res.status(404).json({ mensagem: 'Usuário não encontrado.' });
+        }
+        console.log('Situação atualizada com sucesso.');
+        res.status(200).json({ mensagem: 'Situação atualizada com sucesso.' });
+    });
+});
 
 
 module.exports = rotas;

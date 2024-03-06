@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import  logo  from '../../assets/logo.png'
 
 export function NavBar() {
     const [grupo, setGrupo] = useState(null)
@@ -9,7 +10,7 @@ export function NavBar() {
     return (
         <>
             <header>
-                <div class="logo">Logo</div>
+                <div className="logo"><img width = '200px' height = '180px' src={logo}/></div>
                 <nav>
                     <ul>
                         <li><a href="#">Listar Produtos</a></li>
