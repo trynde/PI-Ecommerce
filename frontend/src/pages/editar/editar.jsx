@@ -31,7 +31,7 @@ export function Editar() {
         <>
             <NavBar></NavBar>
             <div className="container">
-                <h1 className='mt-2 mb-3 text-center'>Edição Usuário</h1>
+                <h1 className='mt-3 mb-3 text-center'>Edição Usuário</h1>
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <input className="form-control" type="text" name="Nome" placeholder="Nome" {...register("nome", { required: true })} />
                     {errors.nome && <span>Nome obrigatório</span>}
