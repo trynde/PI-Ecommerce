@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react"
-import  logo  from '../../assets/logo.png'
+import  logo  from '../../assets/logo.svg'
 
 export function NavBar() {
     const [grupo, setGrupo] = useState(null)
     useEffect(() => {
         setGrupo(localStorage.getItem('grupo'))
     }, [])
-    console.log(grupo);
     return (
         <>
             <header>
-                <div className="logo"><img width = '200px' height = '180px' src={logo}/></div>
+                <div className="logo"><img width = '100px' height = '60px' src={logo}/>
+                </div>
                 <nav>
                     <ul>
                         <li><a href="#">Listar Produtos</a></li>

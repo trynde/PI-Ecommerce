@@ -18,7 +18,9 @@ export function Login() {
         let dados = { email, senha }
         axios.post('http://localhost:3005/login', dados).then((resposta => {
             const grupo = resposta.data.grupo;
+            const id = resposta.data.id;
             localStorage.setItem('grupo', grupo)
+            localStorage.setItem('id', id)
             if (resposta.data.situacao !== 'ativo') {
                 return handleShow()
             }

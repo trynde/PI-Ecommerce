@@ -5,6 +5,7 @@ import { Login } from './pages/login/login';
 import { Usuarios } from './pages/usuarios/listar_usuarios';
 import { Principal } from './pages/principal/principal';
 import { Cadastrar } from './pages/cadastro/cadastro';
+import { Editar } from './pages/editar/editar';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
       <Route path='/Usuarios' element={<Usuarios/>}/>
       <Route path='/Principal' element={<Principal/>}/>
       <Route path='/Cadastrar' element={<Cadastrar/>}/>
+      <Route path='/Editar/:id' element={<Editar/>}/>
     </Routes>
     </BrowserRouter>
   );

@@ -108,7 +108,9 @@ export function Usuarios() {
                                                         <button className="btn" style={{color:'green'}} onClick={() => handleShow(usuario.id, usuario.situacao)}>{usuario.situacao}</button>
                                                     } 
                                                     </td>
-                                                    <td>Editar</td>
+                                                    <td>
+                                                        <button className="btn" onClick={() => navegar(`/Editar/${usuario.id}`)}>Editar</button>
+                                                    </td>
                                                 </tr>
                                             )
                                         })

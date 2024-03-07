@@ -92,27 +92,57 @@ rotas.post('/usuarios', async (req, res) => {
   });
 });
 
+rotas.put('/Editar/:id', (req, res) => {
+  const userId = req.params.id;
+  const { nome, cpf, senha, grupo } = req.body;
 
-  
-  rotas.put('/usuarios/:id', (req, res) => {
-    const userId = req.params.id;
-    const { nome, cpf, senha, grupo } = req.body;
-  
-    // Verifica se todos os campos necessários foram fornecidos
-    if (!nome || !cpf || !senha || !grupo) {
-      return res.status(400).json({ mensagem: 'Por favor, forneça todos os campos: nome, cpf, senha, grupo' });
-    }
-  
-    // Atualiza os dados do usuário no banco de dados
-    const query = `UPDATE usuarios SET nome = ?, cpf = ?, senha = ?, grupo = ? WHERE id = ?`;
-    connection.query(query, [nome, cpf, senha, grupo, userId], (err, result) => {
+  // Consulta o banco de dados para obter a senha atual do usuário
+  const queryGetPassword = `SELECT senha FROM usuarios WHERE id = ?`;
+  connection.query(queryGetPassword, [userId], (err, results) => {
       if (err) {
-        console.error('Erro ao atualizar usuário:', err);
-        return res.status(500).json({ mensagem: 'Ocorreu um erro ao atualizar o usuário' });
+          console.error('Erro ao consultar senha do usuário:', err);
+          return res.status(500).json({ mensagem: 'Ocorreu um erro ao consultar a senha do usuário' });
       }
-      res.status(200).json({ mensagem: 'Usuário atualizado com sucesso' });
-    });
+
+      if (results.length === 0) {
+          return res.status(404).json({ mensagem: 'Usuário não encontrado' });
+      }
+
+      const userPasswordHash = results[0].senha;
+
+      // Compara a senha fornecida com a senha armazenada no banco de dados
+      bcrypt.compare(senha, userPasswordHash, (compareErr, isMatch) => {
+          if (compareErr) {
+              console.error('Erro ao comparar senhas:', compareErr);
+              return res.status(500).json({ mensagem: 'Ocorreu um erro ao comparar as senhas' });
+          }
+
+          if (isMatch) {
+              // Senha fornecida é igual à senha do usuário no banco de dados, retornar erro
+              return res.status(400).json({ mensagem: 'A nova senha deve ser diferente da senha atual' });
+          }
+
+          // As senhas não são iguais, prosseguir com a atualização
+          // Hash da nova senha
+          bcrypt.hash(senha, 10, (hashErr, hashedPassword) => {
+              if (hashErr) {
+                  console.error('Erro ao gerar hash da senha:', hashErr);
+                  return res.status(500).json({ mensagem: 'Ocorreu um erro ao atualizar a senha' });
+              }
+
+              // Atualiza os dados do usuário no banco de dados
+              const queryUpdate = `UPDATE usuarios SET nome = ?, cpf = ?, senha = ?, grupo = ? WHERE id = ?`;
+              connection.query(queryUpdate, [nome, cpf, hashedPassword, grupo, userId], (updateErr, result) => {
+                  if (updateErr) {
+                      console.error('Erro ao atualizar usuário:', updateErr);
+                      return res.status(500).json({ mensagem: 'Ocorreu um erro ao atualizar o usuário' });
+                  }
+                  res.status(200).json({ mensagem: 'Usuário atualizado com sucesso' });
+              });
+          });
+      });
   });
+});
 
   rotas.put('/usuarios/:id/situacao', async (req, res) => {
     const { id } = req.params;
