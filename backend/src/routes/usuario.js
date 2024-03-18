@@ -12,7 +12,7 @@ rotas.get("/", async (req,res) => {
 rotas.post('/login', (req, res) => {
   const { email, senha } = req.body;
 
-  // Verifica se o email e a senha foram fornecidos
+  // Verifica se o email e a senha foram fornecidos para prosseguir
   if (!email || !senha) {
     return res.status(400).json({ mensagem: 'Por favor, forneça email e senha' });
   }
