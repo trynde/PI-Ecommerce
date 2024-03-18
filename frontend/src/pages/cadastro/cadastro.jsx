@@ -32,7 +32,7 @@ export function Cadastrar() {
             <input className="form-control" type="email" name="Email" placeholder="E-mail" {...register("email", { required: true })}/>
             {errors.email && <span>E-mail obrigatório</span>}
             <br/>
-            <input className="form-control" type="text" name="CPF" placeholder="CPF" {...register("cpf", { required: true })}/>
+            <input className="form-control" type="text" name="CPF" placeholder="CPF" maxLength="11" {...register("cpf", { required: true })}/>
             {errors.cpf && <span>CPF obrigatório</span>}
             <br/>
             <input className="form-control" type="password" name="Senha" placeholder="Senha" {...register("senha", { required: true })}/>
