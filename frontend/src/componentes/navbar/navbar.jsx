@@ -13,7 +13,7 @@ export function NavBar() {
                 </div>
                 <nav>
                     <ul>
-                        <li><a href="#">Listar Produtos</a></li>
+                        <li><a href="http://localhost:3000/Produto">Listar Produtos</a></li>
                         {grupo !== 'Administrador' ?
                             <></>
                             :

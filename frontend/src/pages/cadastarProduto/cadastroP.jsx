@@ -1,250 +1,148 @@
-import React, { useState, useRef } from 'react';
-import axios from 'axios';
-import { NavBar } from '../../componentes/navbar/navbar';
+import React, { useState } from "react";
+import axios from "axios";
+import { NavBar } from "../../componentes/navbar/navbar";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 
-export const CadastroP = () => {
-  const [product, setProduct] = useState({
-    name: '',
-    description: '',
-    price: '',
-    rating: 0,
-    images: [],
-    mainImageId: null,
-  });
+export function CadastroP() {
+    const navegar = useNavigate();
+    const [imagem, setImagem] = useState(null); // Estado para armazenar a imagem selecionada
+    const [imagemPreview, setImagemPreview] = useState(null); // Estado para armazenar a visualização da imagem
 
-  const formRef = useRef(null);
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm();
 
-  const handleInputChange = (event) => {
-    const { name, value } = event.target;
-    setProduct({ ...product, [name]: value });
-  };
+    const generateRatingOptions = () => {
+      const options = [];
+      for (let i = 0; i <= 10; i++) {
+        options.push((i / 2).toFixed(1));
+      }
+      return options;
+    };
 
-  const handleImageChange = (event) => {
-    const files = Array.from(event.target.files);
-    const updatedImages = files.map(file => ({
-      id: Date.now() + Math.random(),
-      file
-    }));
-    setProduct({ ...product, images: [...product.images, ...updatedImages] });
-  };
+    // Função para lidar com o envio do formulário
+    const onSubmit = async (dados) => {
+        try {
+            const formData = new FormData(); // Criando um objeto FormData para enviar os dados do formulário
+            formData.append("imagem", imagem); // Adicionando a imagem ao FormData
 
-  const handleImageRemove = (id) => {
-    const updatedImages = product.images.filter(image => image.id !== id);
-    setProduct({
-      ...product,
-      images: updatedImages,
-      mainImageId: product.mainImageId === id ? null : product.mainImageId,
-    });
-  };
+            // Adicionando os outros dados do formulário ao FormData
+            Object.entries(dados).forEach(([key, value]) => {
+                formData.append(key, value);
+            });
 
-  const handleMainImageSelect = (id) => {
-    setProduct({ ...product, mainImageId: id });
-  };
+            // Enviando a requisição com Axios
+            await axios.post(`http://localhost:3005/upload/:id`, formData);
+            navegar("/Produto");
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
-    const formData = new FormData();
-
-    product.images.forEach(image => {
-      formData.append('file', image.file);
-    });
-
-    try {
-      const response = await axios.post('http://localhost:3005/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
+            
+            axios.post('http://localhost:3005/Usuarios', dados)
+            .then((resposta) => {
+                navegar('/Usuarios');
+            })
+        } catch (error) {
+            alert("Erro ao enviar o formulário: " + error.message);
         }
-      });
+    };
 
-      console.log('Resposta do servidor:', response.data);
+    // Função para lidar com a seleção de imagem
+    const handleImagemChange = (event) => {
+        const imagemSelecionada = event.target.files[0]; // Captura a imagem selecionada
+        setImagem(imagemSelecionada); // Atualiza o estado da imagem com o arquivo selecionado
 
-      setProduct({
-        name: '',
-        description: '',
-        price: '',
-        rating: 0,
-        images: [],
-        mainImageId: null
-      });
+        // Exibir a visualização da imagem selecionada
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImagemPreview(reader.result);
+        };
+        reader.readAsDataURL(imagemSelecionada);
+    };
 
-      formRef.current.scrollIntoView({ behavior: 'smooth' });
-    } catch (error) {
-      console.error('Erro ao enviar imagem:', error.message);
-    }
-  };
+    return (
+        <>
+            <NavBar />
+            <div className="container">
+                <h1 className="mt-3 mb-3 text-center">Cadastro de Produto</h1>
+                <form onSubmit={handleSubmit(onSubmit)}>
+                    <input
+                        className="form-control"
+                        type="text"
+                        placeholder="Nome"
+                        {...register("nomeProduto", { required: true })}
+                    />
+                    {errors.nomeProduto && <span>Nome obrigatório</span>}
+                    <br />
+                    <input
+                        type="file"
+                        onChange={handleImagemChange}
+                        accept="image/*"
+                        className="form-control"
+                    />
+                    <br />
+                    {/* Exibição da imagem selecionada */}
+                    {imagemPreview && (
+                        <div className="text-center">
+                            <img
+                                src={imagemPreview}
+                                alt="Imagem selecionada"
+                                style={{ maxWidth: "250px", maxHeight: "250px" }} // Definindo o tamanho máximo da imagem
+                            />
+                        </div>
+                    )}
+                    <br />
+                    <input
+                        className="form-control"
+                        type="text"
+                        placeholder="Descrição"
+                        maxLength="2000"
+                        {...register("descricao", { required: true })}
+                    />
+                    {errors.descricao && <span>Descrição obrigatória</span>}
+                    <br />
+                    <input
+                        className="form-control"
+                        type="number"
+                        placeholder="Preço"
+                        {...register("preco", { required: true })}
+                    />
+                    {errors.preco && <span>Preço obrigatório</span>}
+                    <br />
+                    <input
+                        className="form-control"
+                        type="number"
+                        placeholder="Estoque"
+                        {...register("estoque", { required: true })}
+                    />
+                    {errors.estoque && <span>Estoque obrigatório</span>}
+                    <br />
+                    <input
+                        className="form-control"
+                        type="number"
+                        placeholder="Avaliação"
+                        {...register("avaliacao", { required: true })}
+                    />
+                    {errors.avaliacao && <span>Avaliação obrigatória</span>}
+                    <br />
+                    <select
+                        className="form-select"
+                        aria-label="Default select example"
+                        id="situacao"
+                        {...register("status", { required: true })}
 
-  const handleMouseWheel = (event) => {
-    if (event.deltaY > 0) {
-      window.scrollBy(0, 100);
-    } else {
-      window.scrollBy(0, -100);
-    }
-  };
-
-  const generateRatingOptions = () => {
-    const options = [];
-    for (let i = 0; i <= 10; i++) {
-      options.push((i / 2).toFixed(1));
-    }
-    return options;
-  };
-
-  const style = {
-    container: {
-      maxWidth: '600px',
-      margin: '0 auto',
-      padding: '20px',
-      border: '1px solid #ccc',
-      borderRadius: '5px',
-      boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
-    },
-    input: {
-      marginBottom: '10px',
-      width: '100%',
-      padding: '8px',
-      fontSize: '16px',
-      border: '1px solid #ccc',
-      borderRadius: '5px',
-    },
-    textarea: {
-      marginBottom: '10px',
-      width: '100%',
-      padding: '8px',
-      fontSize: '16px',
-      border: '1px solid #ccc',
-      borderRadius: '5px',
-    },
-    button: {
-      padding: '10px 20px',
-      fontSize: '16px',
-      backgroundColor: '#007bff',
-      color: '#fff',
-      border: 'none',
-      borderRadius: '5px',
-      cursor: 'pointer',
-    },
-    imageInput: {
-      marginBottom: '10px',
-    },
-    previewImageContainer: {
-      display: 'flex',
-      alignItems: 'center',
-      marginBottom: '10px',
-    },
-    previewImage: {
-      maxWidth: '200px',
-      maxHeight: '200px',
-      marginRight: '10px',
-    },
-    removeButton: {
-      padding: '5px',
-      backgroundColor: '#ff0000',
-      color: '#fff',
-      border: 'none',
-      borderRadius: '50%',
-      cursor: 'pointer',
-    },
-    mainImageLabel: {
-      marginRight: '10px',
-    },
-    ratingSelect: {
-      marginBottom: '10px',
-    },
-    scrollToBottomTarget: {
-      marginTop: '100vh',
-    },
-  };
-
-  return (
-    <>
-      <NavBar />
-      <div style={style.container} onWheel={handleMouseWheel}>
-        <div ref={formRef}>
-          <form onSubmit={handleSubmit}>
-            <label htmlFor="name">Nome:</label>
-            <input
-              style={style.input}
-              type="text"
-              name="name"
-              value={product.name}
-              onChange={handleInputChange}
-            />
-
-            <label htmlFor="description">Descrição:</label>
-            <textarea
-              style={style.textarea}
-              name="description"
-              value={product.description}
-              onChange={handleInputChange}
-            />
-
-            <label htmlFor="price">Preço:</label>
-            <input
-              style={style.input}
-              type="text"
-              name="price"
-              value={product.price}
-              onChange={handleInputChange}
-            />
-
-            <label htmlFor="Avaliação">Avaliação:</label>
-            <select
-              style={style.input}
-              name="rating"
-              value={product.rating}
-              onChange={handleInputChange}
-            >
-              {generateRatingOptions().map(option => (
-                <option key={option} value={option}>{option}</option>
-              ))}
-            </select>
-
-            <label htmlFor="images" style={style.imageInput}>
-              Images:
-            </label>
-            <input
-              style={style.imageInput}
-              type="file"
-              accept="image/*"
-              name="images"
-              onChange={handleImageChange}
-              multiple
-            />
-            {product.images.map(image => (
-              <div key={image.id} style={style.previewImageContainer}>
-                <img
-                  src={URL.createObjectURL(image.file)}
-                  alt={`Product Image ${image.id}`}
-                  style={style.previewImage}
-                />
-                <button
-                  style={style.removeButton}
-                  type="button"
-                  onClick={() => handleImageRemove(image.id)}
-                >
-                  X
-                </button>
-                <label style={style.mainImageLabel}>
-                  <input
-                    type="radio"
-                    name="mainImage"
-                    checked={product.mainImageId === image.id}
-                    onChange={() => handleMainImageSelect(image.id)}
-                  />
-                  Imagem Principal
-                </label>
-              </div>
-            ))}
-            <button style={style.button} type="submit">
-              Submit
-            </button>
-          </form>
-        </div>
-        <div style={style.scrollToBottomTarget} />
-      </div>
-    </>
-  );
-};
-
-export default CadastroP;
+                    >
+                        <option value="">Situação</option>
+                        <option value="ativo">Ativo</option>
+                    </select>
+                    {errors.status && <span>Selecione um item válido</span>}
+                    <br />
+                    <button className="btn btn-dark" type="submit">
+                        Cadastrar
+                    </button>
+                </form>
+            </div>
+        </>
+    );
+}

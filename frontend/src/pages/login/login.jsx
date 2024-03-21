@@ -26,7 +26,7 @@ export function Login() {
             }
             navegar('/Principal')
         })).catch((error => {
-            console.log(error)
+            alert("Senha inválida");
         }))
     }
     return (
