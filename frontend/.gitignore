@@ -1,5 +1,5 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
+#commit para registrar que o joão subiu minha parte do front
 # dependencies
 /node_modules
 /.pnp
