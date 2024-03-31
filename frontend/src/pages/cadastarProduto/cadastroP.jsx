@@ -23,6 +23,7 @@ export function CadastroP() {
       return options;
     };
 
+
     // Função para lidar com o envio do formulário
     const onSubmit = async (dados) => {
         try {
@@ -118,25 +119,15 @@ export function CadastroP() {
                     />
                     {errors.estoque && <span>Estoque obrigatório</span>}
                     <br />
-                    <input
-                        className="form-control"
-                        type="number"
-                        placeholder="Avaliação"
-                        {...register("avaliacao", { required: true })}
-                    />
-                    {errors.avaliacao && <span>Avaliação obrigatória</span>}
-                    <br />
-                    <select
-                        className="form-select"
-                        aria-label="Default select example"
-                        id="situacao"
-                        {...register("status", { required: true })}
-
-                    >
-                        <option value="">Situação</option>
+                    <select className="form-control" id="avaliacao" {...register("avaliacao", { required: true })}>
+                        {generateRatingOptions().map(option => (<option key={option} value={option}>{option}</option> ))}
+                    </select>   
+                    {errors.status && <span>Selecione um item válido</span>}
+                    <select style={{display:'none'}} className="form-select" aria-label="Default select example" id="status" {...register("status", { required: true })}>
                         <option value="ativo">Ativo</option>
                     </select>
                     {errors.status && <span>Selecione um item válido</span>}
+                    <br />
                     <br />
                     <button className="btn btn-dark" type="submit">
                         Cadastrar

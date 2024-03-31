@@ -7,7 +7,7 @@ import { Principal } from './pages/principal/principal';
 import { Cadastrar } from './pages/cadastro/cadastro';
 import { Editar } from './pages/editar/editar';
 import { Produto } from './pages/produto/listar_produto'
-import Visu from './pages/visu/visualizar'
+import { Visualizar } from './pages/visu/visualizar'
 import { CadastroP } from './pages/cadastarProduto/cadastroP';
 import { EditarP } from './pages/editarP/editarP';
 
@@ -24,7 +24,7 @@ function App() {
       <Route path='/EditarP/:id' element={<EditarP/>}/>
       <Route path='/CadastrarP' element={<CadastroP/>}/>
       <Route path='/Produto' element={<Produto/>}/>
-      <Route path='/Visualizar/:id' element={<Visu/>}/>
+      <Route path='/Visualizar/:id' element={<Visualizar/>}/>
     </Routes>
     </BrowserRouter>
   );

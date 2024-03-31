@@ -47,9 +47,9 @@ export function Produto() {
 
     function alterarStatus(id, status) {
         if (status === 'ativo') {
-            const trocarSituacao = 'inativo'
-            const objeto = {trocarSituacao}
-            axios.put(`http://localhost:3005/produto/${id}/status`, { status: trocarSituacao }).then(res => {
+            const trocarStatus = 'inativo'
+            const objeto = {trocarStatus}
+            axios.put(`http://localhost:3005/produto/${id}/status`, { status: trocarStatus }).then(res => {
                 listarProdutos()
                 console.log(res)
             }).catch(err => {
@@ -58,9 +58,9 @@ export function Produto() {
             handleClose();
 
         } else {
-            const trocarSituacao = 'ativo'
-            const objeto = {trocarSituacao}
-            axios.put(`http://localhost:3005/produto/${id}/status`, { status: trocarSituacao }).then(res => {
+            const trocarStatus = 'ativo'
+            const objeto = {trocarStatus}
+            axios.put(`http://localhost:3005/produto/${id}/status`, { status: trocarStatus }).then(res => {
                 listarProdutos()
                 console.log(res)
             }).catch(err => {
@@ -96,7 +96,7 @@ export function Produto() {
                                         <th>Estoque</th>
                                         <th>Status</th>
                                         <th>Editar</th>
-                                        <th>Visualizar Imagem</th>
+                                        <th>Visualizar</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -115,10 +115,10 @@ export function Produto() {
                                                     } 
                                                     </td>
                                                 <td>
-                                                    <button className="btn" onClick={() => navegar(`/EditarP/:id${produto.id}`)}>Editar</button>
+                                                    <button className="btn" onClick={() => navegar(`/EditarP/${produto.id}`)}>Editar</button>
                                                 </td>
                                                 <td>
-                                                    <Link to={`/Visualizar/${produto.id}`} className="btn">Ver Imagem</Link>
+                                                    <Link to={`/Visualizar/${produto.id}`} className="btn">Visualizar</Link>
                                                 </td>
                                             </tr>
                                         ))

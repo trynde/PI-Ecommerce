@@ -144,6 +144,20 @@ rotas.put('/Editar/:id', (req, res) => {
   });
 });
 
+rotas.put('/Editar/semSenha/:id', (req, res) => {
+    const userId = req.params.id;
+    const { nome, cpf, grupo } = req.body;
+  // Atualiza os dados do usuário no banco de dados
+                const queryUpdate = `UPDATE usuarios SET nome = ?, cpf = ?, grupo = ? WHERE id = ?`;
+                connection.query(queryUpdate, [nome, cpf, grupo, userId], (updateErr, result) => {
+                    if (updateErr) {
+                        console.error('Erro ao atualizar usuário:', updateErr);
+                        return res.status(500).json({ mensagem: 'Ocorreu um erro ao atualizar o usuário' });
+                    }
+                    res.status(200).json({ mensagem: 'Usuário atualizado com sucesso' });
+                });
+            });
+
   rotas.put('/usuarios/:id/situacao', async (req, res) => {
     const { id } = req.params;
     const { situacao } = req.body;
@@ -167,5 +181,15 @@ rotas.put('/Editar/:id', (req, res) => {
     });
 });
 
+rotas.get('/usuario/:id', async(req, res)=>{
+    const {id} = req.params;
+    connection.query('SELECT * FROM usuarios WHERE id = ?', [id], (error, results) => {
+        if (error) {
+            console.error('Erro ao atualizar situação:', error);
+            return res.status(500).json({ mensagem: 'Erro ao atualizar situação.' });
+        }
+        res.send(results);
+    });
+})
 
 module.exports = rotas;

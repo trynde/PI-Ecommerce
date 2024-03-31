@@ -3,9 +3,11 @@ import { NavBar } from "../../componentes/navbar/navbar";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button, Modal } from "react-bootstrap";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
 
 export function EditarP() {
+    const [produtop, setProdutop] = useState(null)
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
@@ -18,12 +20,28 @@ export function EditarP() {
     } = useForm();
 
     function onSubmit(dados) {
-        delete dados.confirmar
-        axios.put(`http://localhost:3005/editarprodutos/${id}`, dados).then((resposta) => {
-        handleShow()
-    })
-            .catch((error) => alert(error.response.data.mensagem))
+        console.log(dados)
+        axios.put(`http://localhost:3005/editarprodutos/${id}`, dados)
+            .then((resposta) => {
+                // Exibir o modal de sucesso
+                handleShow();
+            })
+            .catch((error) => alert(error.response.data.mensagem));
     }
+    
+
+    function pegarProd(){
+        axios.get(`http://localhost:3005/pescarproduto/${id}`).then((response)=>{
+            setProdutop(response.data)
+        })
+    }
+    
+    useEffect(()=>{
+        pegarProd()
+    },[])
+
+    console.log(produtop)
+    
 
     const generateRatingOptions = () => {
         const options = [];
@@ -38,28 +56,32 @@ export function EditarP() {
             <NavBar />
             <div className="container">
                 <h1 className="mt-3 mb-3 text-center">Editar Produto</h1>
+                {produtop === null?
+                <h1>Carregando</h1>
+                :    
                 <form onSubmit={handleSubmit(onSubmit)}>
-                    <input className="form-control" type="text" placeholder="Nome" {...register("nome", { required: true })}/>
-                    {errors.nome && <span>Nome obrigatório</span>}
-                    <br />
-                    <select className="form-control" {...register("avaliacao", { required: true })}>
+                    <label htmlFor="nomeProduto">Nome:</label>
+                    <input defaultValue={produtop[0].nomeProduto} className="form-control" type="text" placeholder="Nome" id="nomeProduto" {...register("nomeProduto", { required: true })}/>
+                    <br/>
+                    <label htmlFor="avaliação">Avaliação:</label>
+                    <select defaultValue={produtop[0].avaliacao} className="form-control" id="avaliacao" {...register("avaliacao", { required: true })}>
                         {generateRatingOptions().map(option => (<option key={option} value={option}>{option}</option> ))}
                     </select>
-                    {errors.avaliacao && <span>Avaliação obrigatória</span>}
-                    <br />
-                    <input className="form-control" type="text" placeholder="Descrição" {...register("descricao", { required: true })}/>
-                    {errors.descricao && <span>Descrição obrigatória</span>}
-                    <br />
-                    <input className="form-control" type="number" placeholder="Preço" step="0.01" {...register("preco", { required: true })} />
-                    {errors.preco && <span>Preço obrigatório</span>}
-                    <br />
-                    <input className="form-control" type="number" placeholder="Quantidade" {...register("quantidade", { required: true })}/>
-                    {errors.quantidade && <span>Quantidade obrigatória</span>}
+                    <br/>
+                    <label htmlFor="descricao">Descrição:</label>
+                    <input defaultValue={produtop[0].descricao} className="form-control" type="text" placeholder="Descrição" id="descricao" {...register("descricao", { required: true })}/>
+                    <br/>
+                    <label htmlFor="preco">Preço:</label>
+                    <input defaultValue={produtop[0].preco} className="form-control" type="number" placeholder="Preço" step="0.01" id="preco"  {...register("preco", { required: true })} />
+                    <br/>
+                    <label htmlFor="estoque">Estoque:</label>
+                    <input defaultValue={produtop[0].estoque} className="form-control" type="number" placeholder="Quantidade" id="estoque"  {...register("estoque", { required: true })}/>
                     <br />
                     <button className="btn btn-dark" type="submit">
                         Editar
                     </button>
                 </form>
+                }
                 <Modal show={show} onHide={handleClose}>
                     <Modal.Header closeButton>
                         <Modal.Title>Sucesso!</Modal.Title>

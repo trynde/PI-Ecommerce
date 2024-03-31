@@ -65,8 +65,7 @@ export function Cadastrar() {
                     </select>
                     {errors.grupo && <span>Grupo obrigatório</span>}
                     <br />
-                    <select className="form-select" aria-label="Default select example" id="situacao" {...register("situacao", { required: true })}>
-                        <option value="">Situação</option>
+                    <select style={{display:'none'}} className="form-select" aria-label="Default select example" id="situacao" {...register("situacao", { required: true })}>
                         <option value="ativo">Ativo</option>
                     </select>
                     {errors.situacao && <span>Selecione um item válido</span>}

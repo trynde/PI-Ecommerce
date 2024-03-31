@@ -6,7 +6,7 @@ const connection = require("../db/db");
 
 rotas.use(express.json());
 
-rotas.get("/produto", async (req,res) => {
+rotas.get("/", async (req,res) => {
   connection.query('SELECT * FROM produto', (err, result) =>  {
       res.send(result);
   })
@@ -79,10 +79,10 @@ rotas.get("/listarProdutos", async (req, res) => {
 // Rota PUT para editar um produto existente
 rotas.put('/editarprodutos/:id', (req, res) => {
   const id = req.params.id;
-  const { nomeProduto, avaliacao, descricao, preco, estoque, status } = req.body;
+  const { nomeProduto, avaliacao, descricao, preco, estoque } = req.body;
 
-  const queryString = `UPDATE PRODUTO SET nomeProduto=?, avaliacao=?, descricao=?, preco=?, estoque=?, status=? WHERE id=?`;
-  const values = [nomeProduto, avaliacao, descricao, preco, estoque, status, id];
+  const queryString = `UPDATE PRODUTO SET nomeProduto=?, avaliacao=?, descricao=?, preco=?, estoque=? WHERE id=?`;
+  const values = [nomeProduto, avaliacao, descricao, preco, estoque, id];
 
   connection.query(queryString, values, (error, results) => {
       if (error) {
@@ -95,5 +95,39 @@ rotas.put('/editarprodutos/:id', (req, res) => {
   });
 });
 
+rotas.put('/produto/:id/status', async (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    // Verificar se a situação fornecida é válida
+    if (!status) {
+        return res.status(400).json({ mensagem: "A situação não foi fornecida." });
+    }
+
+    // Atualizar a situação do usuário no banco de dados
+    connection.query('UPDATE produto SET status = ? WHERE id = ?', [status, id], (error, results) => {
+        if (error) {
+            console.error('Erro ao atualizar situação:', error);
+            return res.status(500).json({ mensagem: 'Erro ao atualizar situação.' });
+        }
+        if (results.affectedRows === 0) {
+            return res.status(404).json({ mensagem: 'Usuário não encontrado.' });
+        }
+        console.log('Situação atualizada com sucesso.');
+        res.status(200).json({ mensagem: 'Situação atualizada com sucesso.' });
+    });
+});
+
+
+rotas.get('/pescarproduto/:id', async(req, res)=>{
+    const {id} = req.params;
+    connection.query('SELECT * FROM produto WHERE id = ?', [id], (error, results) => {
+        if (error) {
+            console.error('Erro ao atualizar situação:', error);
+            return res.status(500).json({ mensagem: 'Erro ao atualizar situação.' });
+        }
+        res.send(results);
+    });
+})
 
 module.exports = rotas;

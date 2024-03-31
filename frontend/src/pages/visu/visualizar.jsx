@@ -1,37 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import './visualizar.css';
+import './visualizar.css'
 
-export const ProductDetailPage = () => {
-  const [product, setProduct] = useState(null);
+export const Visualizar = () => {
+  const [images, setImages] = useState([
+    'image1.jpg',
+    'image2.jpg',
+    'image3.jpg'
+  ]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [buyButtonDisabled, setBuyButtonDisabled] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:3005/produtos/${id}')
-      .then(response => response.json())
-      .then(data => {
-        // Aqui você pode manipular os dados recebidos do backend
-        // e atualizar o estado do produto
-        setProduct(data);
-      })
-      .catch(error => {
-        console.error('Erro ao obter dados do produto:', error);
-      });
-  }, []);
+    const interval = setInterval(() => {
+      // Troca para a próxima imagem no carrossel
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+    }, 5000); // Troca a cada 5 segundos
+
+    // Limpa o intervalo quando o componente é desmontado
+    return () => clearInterval(interval);
+  }, [currentIndex, images.length]);
 
   const handleChangeImage = (index) => {
     setCurrentIndex(index);
   };
 
-  if (!product) {
-    return <div>Carregando...</div>;
-  }
-
   return (
     <div className="product-detail-page">
       <div className="product-images">
         <div className="carousel">
-          {product.images.map((image, index) => (
+          {images.map((image, index) => (
             <img
               key={index}
               src={image}
@@ -43,14 +40,14 @@ export const ProductDetailPage = () => {
         </div>
       </div>
       <div className="product-info">
-        <h2>{product.name}</h2>
-        <p>{product.description}</p>
-        <p>Preço: ${product.price.toFixed(2)}</p>
-        <p>Avaliação: {product.rating}</p>
+        <h2>Nome do Produto</h2>
+        <p>Descrição do produto...</p>
+        <p>Preço: $XX.XX</p>
+        <p>Avaliação: ⭐⭐⭐⭐</p>
         <button disabled={buyButtonDisabled}>Comprar</button>
       </div>
     </div>
   );
 };
 
-export default ProductDetailPage;
+export default Visualizar;
