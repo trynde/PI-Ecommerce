@@ -3,63 +3,64 @@ import axios from "axios";
 import { NavBar } from "../../componentes/navbar/navbar";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import "./cadastroP.css";
 
 export function CadastroP() {
     const navegar = useNavigate();
-    const [imagem, setImagem] = useState(null); // Estado para armazenar a imagem selecionada
-    const [imagemPreview, setImagemPreview] = useState(null); // Estado para armazenar a visualização da imagem
+
+    const [images, setImages] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const {
         register,
         handleSubmit,
+        watch,
         formState: { errors },
-    } = useForm();
-
-    const generateRatingOptions = () => {
-      const options = [];
-      for (let i = 0; i <= 10; i++) {
-        options.push((i / 2).toFixed(1));
-      }
-      return options;
+        reset,
+    } = useForm()
+    const handleImageChange = (e) => {
+        const newImages = Array.from(e.target.files); // Converte o objeto FileList em um array
+        setImages(prevImages => prevImages.concat(newImages)); // Concatena as novas imagens com as imagens existentes
     };
 
+    const handleRemoveImage = (indexToRemove) => {
+        const updatedImages = images.filter((_, index) => index !== indexToRemove); // Filtra todos os itens, exceto o item no índice indexToRemove
+        setImages(updatedImages); // Atualiza o estado com o novo array sem o item removido
+    };
+    const salvarImagem = async (id) => {
+        setLoading(true);
+        console.log(id)
+        try {
+            for (const image of images) {
+                const formData = new FormData();
+                formData.append('file', image); // Adiciona apenas a imagem atual ao FormData
 
+                const response = await axios.post(`http://localhost:3005/upload/${id}`, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+                console.log(response.data);
+            }
+
+            setImages([]); // Limpa o array de imagens após o envio bem-sucedido
+            setLoading(false);
+        } catch (error) {
+            console.error('Error uploading images:', error);
+            setLoading(false);
+        }
+
+
+    }
     // Função para lidar com o envio do formulário
     const onSubmit = async (dados) => {
-        try {
-            const formData = new FormData(); // Criando um objeto FormData para enviar os dados do formulário
-            formData.append("imagem", imagem); // Adicionando a imagem ao FormData
 
-            // Adicionando os outros dados do formulário ao FormData
-            Object.entries(dados).forEach(([key, value]) => {
-                formData.append(key, value);
+        axios.post('http://localhost:3005/criarProduto', dados)
+            .then(async (resposta) => {
+                await salvarImagem(resposta.data.insertId)
+navegar("/Produto")
             });
 
-            // Enviando a requisição com Axios
-            await axios.post(`http://localhost:3005/upload/:id`, formData);
-            navegar("/Produto");
-
-            
-            axios.post('http://localhost:3005/Usuarios', dados)
-            .then((resposta) => {
-                navegar('/Usuarios');
-            })
-        } catch (error) {
-            alert("Erro ao enviar o formulário: " + error.message);
-        }
-    };
-
-    // Função para lidar com a seleção de imagem
-    const handleImagemChange = (event) => {
-        const imagemSelecionada = event.target.files[0]; // Captura a imagem selecionada
-        setImagem(imagemSelecionada); // Atualiza o estado da imagem com o arquivo selecionado
-
-        // Exibir a visualização da imagem selecionada
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setImagemPreview(reader.result);
-        };
-        reader.readAsDataURL(imagemSelecionada);
     };
 
     return (
@@ -78,21 +79,21 @@ export function CadastroP() {
                     <br />
                     <input
                         type="file"
-                        onChange={handleImagemChange}
+                        onChange={handleImageChange}
                         accept="image/*"
                         className="form-control"
+                        multiple // Permite a seleção de múltiplas imagens
                     />
                     <br />
-                    {/* Exibição da imagem selecionada */}
-                    {imagemPreview && (
-                        <div className="text-center">
-                            <img
-                                src={imagemPreview}
-                                alt="Imagem selecionada"
-                                style={{ maxWidth: "250px", maxHeight: "250px" }} // Definindo o tamanho máximo da imagem
-                            />
-                        </div>
-                    )}
+                    {/* Exibição das visualizações das imagens selecionadas */}
+                    <div style={{ display: "flex", flexDirection: "row" }}>
+                        {images.map((image, index) => (
+                            <div key={index} className="image-container">
+                                <img src={URL.createObjectURL(image)} alt={`Imagem ${index}`} />
+                                <button onClick={() => handleRemoveImage(index)} className="remove-button">Remover</button>
+                            </div>
+                        ))}
+                    </div>
                     <br />
                     <input
                         className="form-control"
@@ -119,15 +120,24 @@ export function CadastroP() {
                     />
                     {errors.estoque && <span>Estoque obrigatório</span>}
                     <br />
-                    <select className="form-control" id="avaliacao" {...register("avaliacao", { required: true })}>
-                        {generateRatingOptions().map(option => (<option key={option} value={option}>{option}</option> ))}
-                    </select>   
-                    {errors.status && <span>Selecione um item válido</span>}
-                    <select style={{display:'none'}} className="form-select" aria-label="Default select example" id="status" {...register("status", { required: true })}>
+                    <input
+                        className="form-control"
+                        type="number"
+                        placeholder="Avaliação"
+                        {...register("avaliacao", { required: true })}
+                    />
+                    {errors.avaliacao && <span>Avaliação obrigatória</span>}
+                    <br />
+                    <select
+                        className="form-select"
+                        aria-label="Default select example"
+                        id="situacao"
+                        {...register("status", { required: true })}
+                    >
+                        <option value="">Situação</option>
                         <option value="ativo">Ativo</option>
                     </select>
                     {errors.status && <span>Selecione um item válido</span>}
-                    <br />
                     <br />
                     <button className="btn btn-dark" type="submit">
                         Cadastrar

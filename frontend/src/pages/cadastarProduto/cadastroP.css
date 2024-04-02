@@ -1,0 +1,27 @@
+.image-container {
+    display: inline-block;
+    margin-right: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .image-container img {
+    width: 100px;
+    height: 100px;
+    margin-bottom: 5px;
+  }
+  
+  .image-container button {
+    display: block;
+    width: 100px;
+    background-color: #f44336;
+    color: #fff;
+    border: none;
+    padding: 5px;
+    text-align: center;
+    cursor: pointer;
+  }
+  
+  .image-container button:hover {
+    background-color: #d32f2f;
+  }
+  
