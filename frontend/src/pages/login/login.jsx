@@ -24,7 +24,7 @@ export function Login() {
             if (resposta.data.situacao !== 'ativo') {
                 return handleShow()
             }
-            navegar('/Principal')
+            navegar('/principalAE')
         })).catch((error => {
             alert("Senha inválida");
         }))

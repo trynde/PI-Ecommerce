@@ -11,6 +11,7 @@ import { Visualizar } from './pages/visu/visualizar'
 import { CadastroP } from './pages/cadastarProduto/cadastroP';
 import { EditarP } from './pages/editarP/editarP';
 import { VisualizarCL } from './pages/visu/visualizarCl'
+import { PrincipalAE } from './pages/principal/principalAE';
 
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
       <Route path='/Login' element={<Login></Login>}/>
       <Route path='/Usuarios' element={<Usuarios/>}/>
       <Route path='/' element={<Principal/>}/>
+      <Route path='/principalAE' element={<PrincipalAE/>}/>
       <Route path='/Cadastrar' element={<Cadastrar/>}/>
       <Route path='/Editar/:id' element={<Editar/>}/>
       <Route path='/EditarP/:id' element={<EditarP/>}/>
