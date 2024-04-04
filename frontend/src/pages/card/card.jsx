@@ -1,16 +1,20 @@
-import { NavBar } from "../../componentes/navbar/navbar";
-import "./principal.css";
-import "../card/card";
-import Card from "../card/card";
-import { useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
-import axios from "axios";
-export function Principal() {
-  const navegar = useNavigate();
+import React, { useState, useEffect } from "react";
+import axios from "axios"; // Importa o Axios
+import "./card.css";
+import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
+
+const Card = (props) => {
+  const navegar = useNavigate()
   const [images, setImages] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const { id } = useParams();
-  const [productInfo, setProductInfo] = useState(null);
+  const [productInfo, setProductInfo] = useState({
+    nomeProduto: "",
+    descricao: "",
+    preco: "",
+  });
 
   useEffect(() => {
     // Função para buscar a imagem do servidor
@@ -33,6 +37,7 @@ export function Principal() {
     };
 
     fetchImage(); // Chama a função de busca de imagem ao montar o componente
+
   }, []);
 
   const handleChangeImage = (index) => {
@@ -43,10 +48,12 @@ export function Principal() {
     // Função para buscar as informações do produto do servidor
     const fetchProductInfo = async () => {
       try {
-        const response = await axios.get(`http://localhost:3005/produto`);
+        const response = await axios.get(
+          `http://localhost:3005/buscarProduto/${props.id}`
+        );
         // Verifica se a resposta é bem-sucedida (status 200)
         if (response.status === 200) {
-          console.log(response.data);
+          console.log(response.data)
 
           setProductInfo(response.data);
         } else {
@@ -65,34 +72,33 @@ export function Principal() {
 
   return (
     <>
-    <NavBar/>
-    <div className="divPrincipal">
-
-      <div className="carde">
-        {productInfo === null ? (
-          <h1>Carregando</h1>
-        ) : (
-          <div>
-            {productInfo.map((produto, index) => {
-              return (
-                <div className="card1" key={index}>
-                  <p className="card1txt">{produto.nomeProduto} </p>
-                  
-                  <p className="card2txt1">{produto.preco} </p>
-                  <button
-                    className="btn"
-                    onClick={() => navegar(`/Visualizar/${produto.id}`)}
-                  >
-                    Detalhe
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-        )}
+    <div class="carde">
+      <div>
+          {images.map((image, index) => {
+            console.log(image);
+                <img
+                  key={index}
+                  src={`http://localhost:3005/images/${image.nomeImagem}`}
+                  alt={`Imagem ${index + 1}`}
+                  width="300px"
+                  height="300px"
+                />
+           
+          })}
+      </div>
+      <div class="card1">
+        <p class="card1txt">Nome </p>
+        <div class="card2">
+          <p class="card2txt1">
+            Preço -{" "}
+            
+          </p>
+          <button className="btn" onClick={() => navegar(`/Visualizar/${productInfo.id}`)}>Detalhe</button>
+        </div>
       </div>
     </div>
-
-    </>
+  </>
   );
-}
+};
+
+export default Card;
