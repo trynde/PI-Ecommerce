@@ -11,6 +11,35 @@ rotas.get("/produto", async (req,res) => {
       res.send(result);
   })
 })
+// Rota para listar produtos com suas imagens
+rotas.get("/listarProdutosImagens", async (req, res) => {
+    try {
+        // Consulta SQL para selecionar produtos com apenas uma imagem por produto
+        const query = `
+            SELECT p.*, MIN(i.nomeImagem) AS nomeImagem
+            FROM produto p
+            LEFT JOIN imagemProduto i ON p.id = i.produtoId
+            GROUP BY p.id
+            ORDER BY p.id DESC
+        `;
+
+        // Execute a consulta SQL
+        connection.query(query, (error, results, fields) => {
+            if (error) {
+                console.error("Erro ao buscar produtos:", error);
+                res.status(500).json({ error: "Falha ao buscar produtos" });
+                return;
+            }
+
+            // Envie os resultados como resposta
+            res.json(results);
+        });
+    } catch (error) {
+        console.error("Erro ao buscar produtos:", error);
+        res.status(500).json({ error: "Falha ao buscar produtos" });
+    }
+});
+
 
 // Rota para upload de imagem
 rotas.post("/upload/:id", function (req, res) {

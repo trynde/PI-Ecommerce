@@ -1,10 +1,11 @@
-import { NavBar } from "../../componentes/navbar/navbar";
+import { NavBar } from "../../componentes/navbar2/navbar";
 import "./principal.css";
 import "../card/card";
 import Card from "../card/card";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
+
 export function Principal() {
   const navegar = useNavigate();
   const [images, setImages] = useState([]);
@@ -43,7 +44,7 @@ export function Principal() {
     // Função para buscar as informações do produto do servidor
     const fetchProductInfo = async () => {
       try {
-        const response = await axios.get(`http://localhost:3005/produto`);
+        const response = await axios.get(`http://localhost:3005/listarProdutosImagens`);
         // Verifica se a resposta é bem-sucedida (status 200)
         if (response.status === 200) {
           console.log(response.data);
@@ -66,22 +67,25 @@ export function Principal() {
   return (
     <>
     <NavBar/>
-    <div className="divPrincipal">
 
-      <div className="carde">
         {productInfo === null ? (
           <h1>Carregando</h1>
         ) : (
-          <div>
+      <div className="divPrincipal">
             {productInfo.map((produto, index) => {
+              console.log(productInfo)
               return (
                 <div className="card1" key={index}>
                   <p className="card1txt">{produto.nomeProduto} </p>
-                  
-                  <p className="card2txt1">{produto.preco} </p>
+                  <img
+                    src={`http://localhost:3005/images/${produto.nomeImagem}`}
+                    width="150px"
+                    height="150px"
+                  />
+                  <p className="card2txt1">R$ {produto.preco} </p>
                   <button
                     className="btn"
-                    onClick={() => navegar(`/Visualizar/${produto.id}`)}
+                    onClick={() => navegar(`/VisualizarCL/${produto.id}`)}
                   >
                     Detalhe
                   </button>
@@ -90,9 +94,6 @@ export function Principal() {
             })}
           </div>
         )}
-      </div>
-    </div>
-
     </>
   );
 }

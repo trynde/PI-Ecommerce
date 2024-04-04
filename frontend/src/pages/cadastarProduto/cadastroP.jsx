@@ -11,6 +11,8 @@ export function CadastroP() {
     const [images, setImages] = useState([]);
     const [loading, setLoading] = useState(false);
 
+    
+
     const {
         register,
         handleSubmit,
@@ -120,21 +122,22 @@ navegar("/Produto")
                     />
                     {errors.estoque && <span>Estoque obrigatório</span>}
                     <br />
-                    <input
+                    <input 
                         className="form-control"
                         type="number"
                         placeholder="Avaliação"
                         {...register("avaliacao", { required: true })}
+                        
                     />
+                    
                     {errors.avaliacao && <span>Avaliação obrigatória</span>}
                     <br />
-                    <select
+                    <select style={{display:'none'}}
                         className="form-select"
                         aria-label="Default select example"
                         id="situacao"
                         {...register("status", { required: true })}
                     >
-                        <option value="">Situação</option>
                         <option value="ativo">Ativo</option>
                     </select>
                     {errors.status && <span>Selecione um item válido</span>}

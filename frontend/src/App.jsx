@@ -10,6 +10,7 @@ import { Produto } from './pages/produto/listar_produto'
 import { Visualizar } from './pages/visu/visualizar'
 import { CadastroP } from './pages/cadastarProduto/cadastroP';
 import { EditarP } from './pages/editarP/editarP';
+import { VisualizarCL } from './pages/visu/visualizarCl'
 
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
       <Route path='/CadastrarP' element={<CadastroP/>}/>
       <Route path='/Produto' element={<Produto/>}/>
       <Route path='/Visualizar/:id' element={<Visualizar/>}/>
+      <Route path='/VisualizarCL/:id' element={<VisualizarCL/>}/>
     </Routes>
     </BrowserRouter>
   );

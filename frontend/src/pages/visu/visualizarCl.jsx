@@ -1,4 +1,4 @@
-import { NavBar } from "../../componentes/navbar/navbar";
+import { NavBar } from "../../componentes/navbar2/navbar";
 import React, { useState, useEffect } from "react";
 import axios from "axios"; // Importa o Axios
 import "./visualizar.css";
@@ -8,7 +8,7 @@ import "swiper/css";
 import "swiper/css/pagination";
 import "./styles.css";
 import { Pagination } from "swiper/modules";
-export const Visualizar = () => {
+export const VisualizarCL = () => {
   const [images, setImages] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [buyButtonDisabled, setBuyButtonDisabled] = useState(true);
@@ -122,4 +122,4 @@ export const Visualizar = () => {
   );
 };
 
-export default Visualizar;
+export default VisualizarCL;
