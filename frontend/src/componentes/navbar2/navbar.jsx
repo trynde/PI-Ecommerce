@@ -4,9 +4,7 @@ import { Cart3 } from 'react-bootstrap-icons';
 
 export function NavBar() {
     const [grupo, setGrupo] = useState(null)
-    useEffect(() => {
-        setGrupo(localStorage.getItem('grupo'))
-    }, [])
+   
     return (
         <>
             <header>
@@ -17,8 +15,9 @@ export function NavBar() {
                 </div>
                 <nav>
                     <ul>
-                        <li><a href="">Entrarﾠ|ﾠCadastrar</a></li>
+                        <li><a href="/Entrar">Entrar</a></li>
                         <li><a href=""><Cart3 size={26}/></a></li>
+        
                     </ul>
                 </nav>
             </header>

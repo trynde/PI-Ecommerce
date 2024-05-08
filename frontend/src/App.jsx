@@ -12,17 +12,26 @@ import { CadastroP } from './pages/cadastarProduto/cadastroP';
 import { EditarP } from './pages/editarP/editarP';
 import { VisualizarCL } from './pages/visu/visualizarCl'
 import { PrincipalAE } from './pages/principal/principalAE';
-
+import { LoginU } from './pages/login/loginU';
+import { CadastrarCli } from './pages/cadastro/cadastroC';
+import { PrincipalC } from './pages/principal/principalC';
+import { Perfil } from './pages/cliente/Perfil';
+import { Carrinho } from './pages/carrinho/carrinho';
 
 function App() {
   return (
     <BrowserRouter>
     <Routes>
       <Route path='/Login' element={<Login></Login>}/>
+      <Route path='/Entrar' element={<LoginU />}/>
       <Route path='/Usuarios' element={<Usuarios/>}/>
       <Route path='/' element={<Principal/>}/>
+      <Route path='/Carrinho' element={<Carrinho/>}/>
+      <Route path='/Perfil/:id' element={<Perfil/>}/>
       <Route path='/principalAE' element={<PrincipalAE/>}/>
+      <Route path='/principalC' element={<PrincipalC/>}/>
       <Route path='/Cadastrar' element={<Cadastrar/>}/>
+      <Route path='/CadastrarCli' element={<CadastrarCli/>}/>
       <Route path='/Editar/:id' element={<Editar/>}/>
       <Route path='/EditarP/:id' element={<EditarP/>}/>
       <Route path='/CadastrarP' element={<CadastroP/>}/>

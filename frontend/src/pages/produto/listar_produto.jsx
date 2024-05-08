@@ -19,7 +19,11 @@ export function Produto() {
     const [show, setShow] = useState(false);
     const [id, setId] = useState(null);
     const [status, setStatus] = useState(null);
+    const [grupo, setGrupo] = useState(null)
 
+    useEffect(() => {
+        setGrupo(localStorage.getItem('grupo'))
+    }, [])
     const handleClose = () => {
         setId(null);
         setShow(false)
@@ -83,7 +87,13 @@ export function Produto() {
                     <div className="pesquisa">
                         <FormControl onChange={(evento) => { setBusca(evento.target.value) }} type="text" placeholder="Pesquisar produto" />
                         <button onClick={() => { setBuscar(busca) }} className="btn btn-dark"><Search /></button>
-                        <button onClick={() => navegar('/CadastrarP')} className="btn btn-dark"><DatabaseFillAdd /></button>
+                        {
+                            grupo === "Estoque"?
+                            <button className="btn btn-dark"><DatabaseFillAdd /></button>
+                            :
+                            <button onClick={() => navegar('/CadastrarP')} className="btn btn-dark"><DatabaseFillAdd /></button>
+
+                        }
                     </div>
                     {
                         produtos.length === 0 ?
@@ -120,7 +130,12 @@ export function Produto() {
                                                     <button className="btn" onClick={() => navegar(`/EditarP/${produto.id}`)}>Editar</button>
                                                 </td>
                                                 <td>
+                                                    {grupo == "Estoque"?
+                                                    <Link className="btn">Ver Imagem</Link>
+                                                    :
                                                     <Link to={`/Visualizar/${produto.id}`} className="btn">Ver Imagem</Link>
+                                                    
+                                                }
                                                 </td>
                                             </tr>
                                         ))
