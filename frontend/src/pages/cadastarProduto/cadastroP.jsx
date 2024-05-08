@@ -11,8 +11,6 @@ export function CadastroP() {
     const [images, setImages] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    
-
     const {
         register,
         handleSubmit,

@@ -5,7 +5,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Button, Modal } from "react-bootstrap";
 import { useState } from "react";
 
-
 export function Editar() {
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
