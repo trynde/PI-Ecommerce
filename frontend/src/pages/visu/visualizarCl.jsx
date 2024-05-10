@@ -1,5 +1,5 @@
 import { NavBar } from "../../componentes/navbar2/navbar";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios"; // Importa o Axios
 import "./visualizar.css";
 import { useParams } from "react-router-dom";
@@ -8,11 +8,20 @@ import "swiper/css";
 import "swiper/css/pagination";
 import "./styles.css";
 import { Pagination } from "swiper/modules";
+import { useNavigate } from "react-router-dom";
+import { AppContext } from '../../componentes/context/appContext';
+
 export const VisualizarCL = () => {
+  const navegar = useNavigate()
   const [images, setImages] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [buyButtonDisabled, setBuyButtonDisabled] = useState(true);
   const { id } = useParams();
+  const { carrinho, setCarrinho, cartItems,setCartItems } = useContext(AppContext);
+  const adicionarAoCarrinho = (produto) => {
+    setCarrinho([...carrinho, produto]);
+    setCartItems([...cartItems,produto])
+};
   const [productInfo, setProductInfo] = useState({
     nomeProduto: "",
     descricao: "",
@@ -115,7 +124,16 @@ export const VisualizarCL = () => {
         <p>{productInfo.descricao}</p>
         <p>Preço: R${productInfo.preco}</p>
         <p>Avaliação: ⭐ {productInfo.avaliacao}</p>
-        <button disabled={buyButtonDisabled}>Comprar</button>
+        <button onClick={() => navegar(`/Carrinho`)} className="btn btn-dark">Comprar</button>
+        <button className='btn btn-danger' onClick={() => {
+                                        adicionarAoCarrinho(productInfo)
+                                        return (
+                                            <NavBar data={carrinho} />
+
+                                        )
+                                    }}>
+                                        Adicionar ao Carrinho
+                                    </button>
       </div>
     </div>
     </>

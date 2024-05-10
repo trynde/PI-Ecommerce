@@ -1,7 +1,5 @@
 import { NavBar } from "../../componentes/navbar2/navbar";
 import "./principal.css";
-import "../card/card";
-import Card from "../card/card";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";

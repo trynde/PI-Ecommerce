@@ -12,9 +12,9 @@ rotas.get("/cliente", async (req,res) => {
 })
 
 // Rota para buscar um cliente específico pelo ID
-rotas.get('/clientes/:id', (req, res) => {
+rotas.get('/BuscarClientes/:id', (req, res) => {
   const clienteId = req.params.id;
-  connection.query('SELECT * FROM clientes WHERE id = ?', [clienteId], (err, results) => {
+  connection.query('SELECT * FROM cliente WHERE id = ?', [clienteId], (err, results) => {
     if (err) {
       console.error('Erro ao buscar cliente:', err);
       res.status(500).json({ message: 'Erro ao buscar cliente' });
@@ -69,7 +69,7 @@ rotas.post('/loginU', (req, res) => {
   });
 
   rotas.post('/cliente', async (req, res) => {
-    const { nome, data_nascimento, genero, email, cpf, senha, endereco, numero, bairro, cidade, estado  } = req.body;
+    const { nome, data_nascimento, genero, email, cpf, senha, endereco, numero, bairro, cidade, estado, cep  } = req.body;
     const salt = await bcrypt.genSalt(12);
     const passwordHash = await bcrypt.hash(senha, salt);
   
@@ -97,8 +97,8 @@ rotas.post('/loginU', (req, res) => {
             }
   
             // Insere os dados na tabela usuarios
-            const query = 'INSERT INTO cliente (nome, data_nascimento, genero, email, cpf, senha, endereco, numero, bairro, cidade, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-            connection.query(query, [nome, data_nascimento, genero, email, cpf, passwordHash, endereco, numero, bairro, cidade, estado], (error, results) => {
+            const query = 'INSERT INTO cliente (nome, data_nascimento, genero, email, cpf, senha, endereco, numero, bairro, cidade, estado, cep) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+            connection.query(query, [nome, data_nascimento, genero, email, cpf, passwordHash, endereco, numero, bairro, cidade, estado, cep], (error, results) => {
                 if (error) {
                     console.error('Erro ao inserir dados:', error);
                     return res.status(500).json({ mensagem: 'Erro ao inserir dados.' });
@@ -134,7 +134,7 @@ rotas.get('/buscarcliente/:id', async(req, res)=>{
 
 rotas.put('/editarCliente/:id', (req, res) => {
   const userId = req.params.id;
-  const { nome, data_nascimento, genero, email, cpf, passwordHash, endereco, numero, bairro, cidade, estado } = req.body;
+  const { nome, data_nascimento, genero, email, cpf, senha } = req.body;
 
   // Consulta o banco de dados para obter a senha atual do usuário
   const queryGetPassword = `SELECT senha FROM cliente WHERE id = ?`;
@@ -171,8 +171,8 @@ rotas.put('/editarCliente/:id', (req, res) => {
               }
 
               // Atualiza os dados do usuário no banco de dados
-              const queryUpdate = `UPDATE cliente SET nome = ?, data_nascimento = ?, genero = ?, email = ?, cpf = ?, senha = ?, endereco = ?, numero = ?, bairro = ?, cidade = ?, estado = ? WHERE id = ?`;
-              connection.query(queryUpdate, [nome, data_nascimento, genero, email, cpf, passwordHash, endereco, numero, bairro, cidade, estado ], (updateErr, result) => {
+              const queryUpdate = `UPDATE cliente SET nome = ?, data_nascimento = ?, genero = ?, email = ?, cpf = ?, senha = ? WHERE id = ?`;
+              connection.query(queryUpdate, [nome, data_nascimento, genero, email, cpf, senha], (updateErr, result) => {
                   if (updateErr) {
                       console.error('Erro ao atualizar usuário:', updateErr);
                       return res.status(500).json({ mensagem: 'Ocorreu um erro ao atualizar o usuário' });
@@ -181,6 +181,22 @@ rotas.put('/editarCliente/:id', (req, res) => {
               });
           });
       });
+  });
+});
+
+rotas.post('/endereco', async (req, res) => {
+  const { cliente_id, endereco, numero, bairro, cidade, estado } = req.body;
+
+
+  // Insere os dados na tabela enderecos
+  const query = 'INSERT INTO endereco_alternativo (cliente_id, endereco, numero, bairro, cidade, estado) VALUES (?, ?, ?, ?, ?, ?)';
+  connection.query(query, [cliente_id, endereco, numero, bairro, cidade, estado], (error, results) => {
+    if (error) {
+      console.error('Erro ao inserir dados:', error);
+      return res.status(500).json({ mensagem: 'Erro ao inserir dados.' });
+    }
+    console.log('Dados inseridos com sucesso:', results);
+    res.status(201).json({ mensagem: 'Dados inseridos com sucesso.' });
   });
 });
 

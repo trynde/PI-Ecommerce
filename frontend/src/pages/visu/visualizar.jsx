@@ -8,11 +8,13 @@ import "swiper/css";
 import "swiper/css/pagination";
 import "./styles.css";
 import { Pagination } from "swiper/modules";
+
 export const Visualizar = () => {
   const [images, setImages] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [buyButtonDisabled, setBuyButtonDisabled] = useState(true);
   const { id } = useParams();
+  
   const [productInfo, setProductInfo] = useState({
     nomeProduto: "",
     descricao: "",

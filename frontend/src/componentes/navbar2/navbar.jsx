@@ -16,7 +16,7 @@ export function NavBar() {
                 <nav>
                     <ul>
                         <li><a href="/Entrar">Entrar</a></li>
-                        <li><a href=""><Cart3 size={26}/></a></li>
+                        <li><a href="/Carrinho"><Cart3 size={26}/></a></li>
         
                     </ul>
                 </nav>

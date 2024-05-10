@@ -2,11 +2,14 @@ import { useEffect, useState } from "react";
 import logo from '../../assets/logo.svg';
 import { Cart3, Person } from 'react-bootstrap-icons';
 import { Link } from "react-router-dom";
+import axios from "axios";
+import { useParams } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+
 
 export function NavBar() {
-    const [grupo, setGrupo] = useState(null);
-    const [id, setID] = useState('');
-   
+    const { id } = useParams("");
+
 
     return (
         <>

@@ -16,23 +16,27 @@ import { LoginU } from './pages/login/loginU';
 import { CadastrarCli } from './pages/cadastro/cadastroC';
 import { PrincipalC } from './pages/principal/principalC';
 import { Perfil } from './pages/cliente/Perfil';
-import { Carrinho } from './pages/carrinho/carrinho';
+import { EditarCliente } from './pages/cliente/editarPerfil';
+import { NovoEnd } from './pages/cliente/novoEnd';
+
 
 function App() {
   return (
+    
     <BrowserRouter>
     <Routes>
       <Route path='/Login' element={<Login></Login>}/>
       <Route path='/Entrar' element={<LoginU />}/>
       <Route path='/Usuarios' element={<Usuarios/>}/>
       <Route path='/' element={<Principal/>}/>
-      <Route path='/Carrinho' element={<Carrinho/>}/>
+      <Route path='/NovoEnd/:id' element={<NovoEnd/>}/>
       <Route path='/Perfil/:id' element={<Perfil/>}/>
       <Route path='/principalAE' element={<PrincipalAE/>}/>
       <Route path='/principalC' element={<PrincipalC/>}/>
       <Route path='/Cadastrar' element={<Cadastrar/>}/>
       <Route path='/CadastrarCli' element={<CadastrarCli/>}/>
       <Route path='/Editar/:id' element={<Editar/>}/>
+      <Route path='/EditarCliente/:id' element={<EditarCliente/>}/>
       <Route path='/EditarP/:id' element={<EditarP/>}/>
       <Route path='/CadastrarP' element={<CadastroP/>}/>
       <Route path='/Produto' element={<Produto/>}/>
@@ -40,6 +44,7 @@ function App() {
       <Route path='/VisualizarCL/:id' element={<VisualizarCL/>}/>
     </Routes>
     </BrowserRouter>
+  
   );
 }
 

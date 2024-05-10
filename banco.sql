@@ -42,3 +42,29 @@ CREATE TABLE imagemProduto (
   produtoId  VARCHAR(255),
   FOREIGN KEY (produtoId) REFERENCES produto(id) ON DELETE CASCADE
 );
+
+CREATE TABLE cliente (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    data_nascimento date NOT NULL,
+    genero ENUM('Masculino', 'Feminino', 'Outro') NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    cpf VARCHAR(11) UNIQUE NOT NULL,
+    senha VARCHAR(255) NOT NULL,
+    endereco VARCHAR(255) NOT NULL,
+    numero VARCHAR(255) NOT NULL,
+    bairro VARCHAR(255) NOT NULL,
+    cidade VARCHAR(255) NOT NULL,
+    estado VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE endereco_alternativo (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    cliente_id INT,
+    endereco VARCHAR(255) NOT NULL,
+    numero VARCHAR(255) NOT NULL,
+    bairro VARCHAR(255) NOT NULL,
+    cidade VARCHAR(255) NOT NULL,
+    estado VARCHAR(255) NOT NULL,
+    FOREIGN KEY (cliente_id) REFERENCES cliente(id)
+);

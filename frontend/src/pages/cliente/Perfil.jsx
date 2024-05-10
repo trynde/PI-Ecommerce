@@ -2,35 +2,58 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { NavBar } from '../../componentes/navbar3/navbar';
+import { useNavigate } from "react-router-dom";
 
 export function Perfil() {
-  const [cliente, setCliente] = useState(null);
+  const navegar = useNavigate()
   const { id } = useParams(); // Obtem o ID do cliente da rota
+  const [cliente, setCliente] = useState();
 
   useEffect(() => {
-    const fetchUser = async () => {
+    // Função para buscar as informações do produto do servidor
+    const fetchClienteInfo = async () => {
       try {
-        const response = await axios.get(`http://localhost:3005/cliente/${id}`);
-        setCliente(response.data);
+        const response = await axios.get(
+          `http://localhost:3005/BuscarClientes/${id}`
+        );
+        // Verifica se a resposta é bem-sucedida (status 200)
+        if (response.status === 200) {
+          console.log(response.data)
+
+          setCliente(response.data);
+        } else {
+          console.error(
+            "Erro ao buscar informações do cliente:",
+            response.statusText
+          );
+        }
       } catch (error) {
-        console.error('Erro ao buscar informações do cliente:', error);
+        console.error("Erro ao buscar informações do cliente:", error.message);
       }
     };
 
-    fetchUser();
-  }, [id]);
+    fetchClienteInfo(); // Chama a função de busca de informações do produto ao montar o componente
+  }, []);
 
+  
   return (
     <>
     <NavBar></NavBar>
     <div className="profile">
+      
       {cliente ? (
-        <div>
-          <h1>Perfil de {cliente.nome}</h1>
-          <p><strong>Nome:</strong> {cliente.nome}</p>
-          <p><strong>Email:</strong> {cliente.email}</p>
-          <p><strong>Idade:</strong> {cliente.idade}</p>
-          {/* Adicione outras informações do usuário conforme necessário */}
+        
+        <div className='info'>
+          <h1 className='mt-3 mb-3 text-center'>Perfil de {cliente.nome}</h1>
+          <p><b>Data de Nascimento: </b>{cliente.data_nascimento}</p>
+          <p><b>Genero: </b>{cliente.genero}</p>
+          <p><b>Email: </b>{cliente.email}</p>
+          <p><b>Endereço: </b>{cliente.endereco}</p>
+          <p><b>Cidade: </b>{cliente.cidade}</p>
+          <button onClick={() => navegar(`/EditarCliente/${id}`)} className="btn btn-dark">Editar</button>
+          <br/>
+          <br/>
+          <button onClick={() => navegar(`/NovoEnd/${id}`)} className="btn btn-dark">Adicionar um novo Endereço</button>
         </div>
       ) : (
         <p>Carregando...</p>
