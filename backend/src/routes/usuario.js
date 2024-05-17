@@ -92,57 +92,78 @@ rotas.post('/usuarios', async (req, res) => {
   });
 });
 
+
 rotas.put('/Editar/:id', (req, res) => {
-  const userId = req.params.id;
-  const { nome, cpf, senha, grupo } = req.body;
+    const userId = req.params.id;
+    const { nome, cpf, senha, grupo } = req.body;
 
-  // Consulta o banco de dados para obter a senha atual do usuário
-  const queryGetPassword = `SELECT senha FROM usuarios WHERE id = ?`;
-  connection.query(queryGetPassword, [userId], (err, results) => {
-      if (err) {
-          console.error('Erro ao consultar senha do usuário:', err);
-          return res.status(500).json({ mensagem: 'Ocorreu um erro ao consultar a senha do usuário' });
-      }
+    // Consulta o banco de dados para obter a senha atual do usuário
+    const queryGetPassword = `SELECT senha FROM usuarios WHERE id = ?`;
+    connection.query(queryGetPassword, [userId], (err, results) => {
+        if (err) {
+            console.error('Erro ao consultar senha do usuário:', err);
+            return res.status(500).json({ mensagem: 'Ocorreu um erro ao consultar a senha do usuário' });
+        }
 
-      if (results.length === 0) {
-          return res.status(404).json({ mensagem: 'Usuário não encontrado' });
-      }
+        if (results.length === 0) {
+            return res.status(404).json({ mensagem: 'Usuário não encontrado' });
+        }
 
-      const userPasswordHash = results[0].senha;
+        const userPasswordHash = results[0].senha;
 
-      // Compara a senha fornecida com a senha armazenada no banco de dados
-      bcrypt.compare(senha, userPasswordHash, (compareErr, isMatch) => {
-          if (compareErr) {
-              console.error('Erro ao comparar senhas:', compareErr);
-              return res.status(500).json({ mensagem: 'Ocorreu um erro ao comparar as senhas' });
-          }
+        // Verifica se a senha foi fornecida e precisa ser atualizada
+        if (senha) {
+            bcrypt.compare(senha, userPasswordHash, (compareErr, isMatch) => {
+                if (compareErr) {
+                    console.error('Erro ao comparar senhas:', compareErr);
+                    return res.status(500).json({ mensagem: 'Ocorreu um erro ao comparar as senhas' });
+                }
 
-          if (isMatch) {
-              // Senha fornecida é igual à senha do usuário no banco de dados, retornar erro
-              return res.status(400).json({ mensagem: 'A nova senha deve ser diferente da senha atual' });
-          }
+                if (isMatch) {
+                    // Senha fornecida é igual à senha do usuário no banco de dados, retornar erro
+                    return res.status(400).json({ mensagem: 'A nova senha deve ser diferente da senha atual' });
+                }
 
-          // As senhas não são iguais, prosseguir com a atualização
-          // Hash da nova senha
-          bcrypt.hash(senha, 10, (hashErr, hashedPassword) => {
-              if (hashErr) {
-                  console.error('Erro ao gerar hash da senha:', hashErr);
-                  return res.status(500).json({ mensagem: 'Ocorreu um erro ao atualizar a senha' });
-              }
+                // As senhas não são iguais, prosseguir com a atualização
+                // Hash da nova senha
+                bcrypt.hash(senha, 10, (hashErr, hashedPassword) => {
+                    if (hashErr) {
+                        console.error('Erro ao gerar hash da senha:', hashErr);
+                        return res.status(500).json({ mensagem: 'Ocorreu um erro ao atualizar a senha' });
+                    }
 
-              // Atualiza os dados do usuário no banco de dados
-              const queryUpdate = `UPDATE usuarios SET nome = ?, cpf = ?, senha = ?, grupo = ? WHERE id = ?`;
-              connection.query(queryUpdate, [nome, cpf, hashedPassword, grupo, userId], (updateErr, result) => {
-                  if (updateErr) {
-                      console.error('Erro ao atualizar usuário:', updateErr);
-                      return res.status(500).json({ mensagem: 'Ocorreu um erro ao atualizar o usuário' });
-                  }
-                  res.status(200).json({ mensagem: 'Usuário atualizado com sucesso' });
-              });
-          });
-      });
-  });
+                    // Atualiza a senha no banco de dados
+                    atualizarUsuario(userId, nome, cpf, hashedPassword, grupo, res);
+                });
+            });
+        } else {
+            // Não precisa atualizar a senha, prosseguir com a atualização dos outros campos
+            atualizarUsuario(userId, nome, cpf, null, grupo, res);
+        }
+    });
 });
+
+function atualizarUsuario(userId, nome, cpf, senha, grupo, res) {
+    // Cria um objeto com os campos a serem atualizados
+    const camposParaAtualizar = {};
+    if (nome) camposParaAtualizar.nome = nome;
+    if (cpf) camposParaAtualizar.cpf = cpf;
+    if (senha) camposParaAtualizar.senha = senha;
+    if (grupo) camposParaAtualizar.grupo = grupo;
+
+    // Monta a query de atualização dinamicamente
+    const setClause = Object.keys(camposParaAtualizar).map(campo => `${campo} = ?`).join(', ');
+    const queryUpdate = `UPDATE usuarios SET ${setClause} WHERE id = ?`;
+    const valores = [...Object.values(camposParaAtualizar), userId];
+
+    connection.query(queryUpdate, valores, (updateErr, result) => {
+        if (updateErr) {
+            console.error('Erro ao atualizar usuário:', updateErr);
+            return res.status(500).json({ mensagem: 'Ocorreu um erro ao atualizar o usuário' });
+        }
+        res.status(200).json({ mensagem: 'Usuário atualizado com sucesso' });
+    });
+}
 
 rotas.put('/Editar/semSenha/:id', (req, res) => {
     const userId = req.params.id;
@@ -157,6 +178,17 @@ rotas.put('/Editar/semSenha/:id', (req, res) => {
                     res.status(200).json({ mensagem: 'Usuário atualizado com sucesso' });
                 });
             });
+
+  rotas.get('/pescarusuarios/:id', async(req, res)=>{
+      const {id} = req.params;
+      connection.query('SELECT * FROM usuarios WHERE id = ?', [id], (error, results) => {
+          if (error) {
+              console.error('Erro ao atualizar situação:', error);
+              return res.status(500).json({ mensagem: 'Erro ao atualizar situação.' });
+          }
+          res.send(results);
+      });
+  })
 
   rotas.put('/usuarios/:id/situacao', async (req, res) => {
     const { id } = req.params;

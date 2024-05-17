@@ -120,7 +120,7 @@ export function EditarP() {
                     :
                     <div>
                         {
-    grupo !== "Estoque"?
+    grupo !== "Administrador"?
     <div>
        <form onSubmit={handleSubmit(onSubmit)}>
         <div style={{display:"none"}}>

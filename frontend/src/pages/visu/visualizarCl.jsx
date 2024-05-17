@@ -1,6 +1,6 @@
 import { NavBar } from "../../componentes/navbar2/navbar";
 import React, { useState, useEffect, useContext } from "react";
-import axios from "axios"; // Importa o Axios
+import axios from "axios";
 import "./visualizar.css";
 import { useParams } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -9,19 +9,14 @@ import "swiper/css/pagination";
 import "./styles.css";
 import { Pagination } from "swiper/modules";
 import { useNavigate } from "react-router-dom";
-import { AppContext } from '../../componentes/context/appContext';
+import { CartContext } from "../../componentes/contexts/CartContext";
 
 export const VisualizarCL = () => {
-  const navegar = useNavigate()
+  const navegar = useNavigate();
   const [images, setImages] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [buyButtonDisabled, setBuyButtonDisabled] = useState(true);
   const { id } = useParams();
-  const { carrinho, setCarrinho, cartItems,setCartItems } = useContext(AppContext);
-  const adicionarAoCarrinho = (produto) => {
-    setCarrinho([...carrinho, produto]);
-    setCartItems([...cartItems,produto])
-};
+  const { addToCart, cart } = useContext(CartContext);
   const [productInfo, setProductInfo] = useState({
     nomeProduto: "",
     descricao: "",
@@ -29,16 +24,10 @@ export const VisualizarCL = () => {
   });
 
   useEffect(() => {
-    // Função para buscar a imagem do servidor
     const fetchImage = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:3005/buscarImagem/${id}`
-        );
-        // Verifica se a resposta é bem-sucedida (status 200)
+        const response = await axios.get(`http://localhost:3005/buscarImagem/${id}`);
         if (response.status === 200) {
-          // Atualiza o estado de imagens com a URL da imagem recebida do servidor
-          console.log(response);
           setImages(response.data);
         } else {
           console.error("Erro ao buscar imagem:", response.statusText);
@@ -48,14 +37,12 @@ export const VisualizarCL = () => {
       }
     };
 
-    fetchImage(); // Chama a função de busca de imagem ao montar o componente
+    fetchImage();
 
     const interval = setInterval(() => {
-      // Troca para a próxima imagem no carrossel
       setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 5000); // Troca a cada 5 segundos
+    }, 5000);
 
-    // Limpa o intervalo quando o componente é desmontado
     return () => clearInterval(interval);
   }, [currentIndex, images.length]);
 
@@ -64,78 +51,77 @@ export const VisualizarCL = () => {
   };
 
   useEffect(() => {
-    // Função para buscar as informações do produto do servidor
     const fetchProductInfo = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:3005/buscarProduto/${id}`
-        );
-        // Verifica se a resposta é bem-sucedida (status 200)
+        const response = await axios.get(`http://localhost:3005/buscarProduto/${id}`);
         if (response.status === 200) {
-          console.log(response.data)
-
           setProductInfo(response.data[0]);
         } else {
-          console.error(
-            "Erro ao buscar informações do produto:",
-            response.statusText
-          );
+          console.error("Erro ao buscar informações do produto:", response.statusText);
         }
       } catch (error) {
         console.error("Erro ao buscar informações do produto:", error.message);
       }
     };
 
-    fetchProductInfo(); // Chama a função de busca de informações do produto ao montar o componente
-  }, []);
+    fetchProductInfo();
+  }, [id]);
 
+  const handleBuy = () => {
+    const product = {
+      id,
+      nomeProduto: productInfo.nomeProduto,
+      descricao: productInfo.descricao,
+      preco: productInfo.preco,
+      quantity: 1 // Definindo a quantidade inicial como 1 ao adicionar ao carrinho
+    };
+    
+    // Adiciona o produto ao carrinho
+    addToCart(product);
+  
+    // Verifica se o produto foi adicionado ao carrinho corretamente
+    if (cart.find(item => item.id === product.id)) {
+      // Produto adicionado com sucesso
+      alert("Produto adicionado ao carrinho com sucesso!");
+    } else {
+      // Produto não pôde ser adicionado
+      alert("Erro ao adicionar produto ao carrinho.");
+    }
+  };
+  
+  
   return (
     <>
-    <NavBar/>
-    <div className="product-detail-page">
-      <div className="product-images">
-        <div className="carousel">
-          <Swiper
-            pagination={{
-              dynamicBullets: true,
-            }}
-            modules={[Pagination]}
-            className="mySwiper"
-          >
-            {images.map((image, index) => {
-              console.log(image);
-              return (
-                <SwiperSlide>
+      <NavBar />
+      <div className="product-detail-page">
+        <div className="product-images">
+          <div className="carousel">
+            <Swiper
+              pagination={{ dynamicBullets: true }}
+              modules={[Pagination]}
+              className="mySwiper"
+            >
+              {images.map((image, index) => (
+                <SwiperSlide key={index}>
                   <img
-                    key={index}
                     src={`http://localhost:3005/images/${image.nomeImagem}`}
                     alt={`Imagem ${index + 1}`}
                     width="300px"
                     height="300px"
                   />
                 </SwiperSlide>
-              );
-            })}
-          </Swiper>
+              ))}
+            </Swiper>
+          </div>
+        </div>
+        <div className="product-info">
+          <h2>{productInfo.nomeProduto}</h2>
+          <p>{productInfo.descricao}</p>
+          <p>Preço: R${productInfo.preco}</p>
+          <p>Avaliação: ⭐ {productInfo.avaliacao}</p>
+          <button className="btn btn-dark" onClick={handleBuy}>Comprar</button>
         </div>
       </div>
-      <div className="product-info">
-        <h2>{productInfo.nomeProduto}</h2>
-        <p>{productInfo.descricao}</p>
-        <p>Preço: R${productInfo.preco}</p>
-        <p>Avaliação: ⭐ {productInfo.avaliacao}</p>
-        <button onClick={() => navegar(`/Carrinho`)} className="btn btn-dark">Comprar</button>
-        <button className='btn btn-danger' onClick={() => {
-                                        adicionarAoCarrinho(productInfo)
-                                        return (
-                                            <NavBar data={carrinho} />
-
-                                        )
-                                    }}>
-                                        Adicionar ao Carrinho
-                                    </button>
-      </div>
-    </div>
     </>
   );
 };

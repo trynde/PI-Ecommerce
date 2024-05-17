@@ -31,7 +31,7 @@ export function Login() {
     }
     return (
         <div className="login-container container">
-            <h2>Login</h2>
+            <h2>Entrar</h2>
             <input className="inputLogin mb-2 mt-2 form-control" type="text" name="email" placeholder="E-mail" onChange={(evento) => { setEmail(evento.target.value) }} required />
             <input className="inputLogin mb-2 form-control" type="password" name="password" placeholder="Senha" onChange={(evento) => { setSenha(evento.target.value) }} required />
             <button className="btn btn-dark" type="submit" onClick={() => { entrar() }}>Entrar</button>

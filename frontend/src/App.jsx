@@ -18,12 +18,13 @@ import { PrincipalC } from './pages/principal/principalC';
 import { Perfil } from './pages/cliente/Perfil';
 import { EditarCliente } from './pages/cliente/editarPerfil';
 import { NovoEnd } from './pages/cliente/novoEnd';
-
+import { CartProvider } from "./componentes/contexts/CartContext";
+import { Cart } from './pages/cart/Cart';
 
 function App() {
   return (
-    
     <BrowserRouter>
+        <CartProvider>
     <Routes>
       <Route path='/Login' element={<Login></Login>}/>
       <Route path='/Entrar' element={<LoginU />}/>
@@ -42,9 +43,10 @@ function App() {
       <Route path='/Produto' element={<Produto/>}/>
       <Route path='/Visualizar/:id' element={<Visualizar/>}/>
       <Route path='/VisualizarCL/:id' element={<VisualizarCL/>}/>
+      <Route path="/Carrinho" element={<Cart />}/>
     </Routes>
+    </CartProvider>
     </BrowserRouter>
-  
   );
 }
 
