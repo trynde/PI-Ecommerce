@@ -11,19 +11,6 @@ CREATE TABLE usuarios (
     situacao VARCHAR(50) NOT NULL
     );
 
-    CREATE TABLE cliente (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-	  nome VARCHAR(255) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    cpf VARCHAR(11) UNIQUE NOT NULL,
-    senha VARCHAR(255) NOT NULL,
-    endereco VARCHAR(255) NOT NULL,
-    numero VARCHAR(255) NOT NULL,
-    bairro VARCHAR(255) NOT NULL,
-    cidade VARCHAR(255) NOT NULL,
-    estado VARCHAR(255) NOT NULL
-    );
-
     -- Criação da tabela 'produto'
 CREATE TABLE produto (
   id SERIAL PRIMARY KEY,
@@ -37,7 +24,7 @@ CREATE TABLE produto (
 
 -- Criação da tabela 'imagemProduto'
 CREATE TABLE imagemProduto (
-  id SERIAL PRIMARY KEY,
+  id INT AUTO_INCREMEN PRIMARY KEY,
   nomeImagem VARCHAR(255) NOT NULL,
   produtoId  VARCHAR(255),
   FOREIGN KEY (produtoId) REFERENCES produto(id) ON DELETE CASCADE
