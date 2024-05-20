@@ -42,7 +42,8 @@ CREATE TABLE cliente (
     numero VARCHAR(255) NOT NULL,
     bairro VARCHAR(255) NOT NULL,
     cidade VARCHAR(255) NOT NULL,
-    estado VARCHAR(255) NOT NULL
+    estado VARCHAR(255) NOT NULL,
+    cep VARCHAR(10) NOT NULL
 );
 
 CREATE TABLE endereco_alternativo (
