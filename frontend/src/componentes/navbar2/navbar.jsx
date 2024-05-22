@@ -3,7 +3,6 @@ import  logo  from '../../assets/logo.svg'
 import { Cart3 } from 'react-bootstrap-icons';
 
 export function NavBar() {
-    const [grupo, setGrupo] = useState(null)
    
     return (
         <>

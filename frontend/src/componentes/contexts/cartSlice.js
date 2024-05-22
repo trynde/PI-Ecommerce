@@ -1,8 +1,20 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const initialState = {
-  cart: [],
+// Função para carregar o estado do localStorage
+const loadFromLocalStorage = () => {
+  try {
+    const serializedState = localStorage.getItem('cartState');
+    if (serializedState === null) {
+      return { cart: [] };
+    }
+    return JSON.parse(serializedState);
+  } catch (e) {
+    console.warn('Could not load state from localStorage', e);
+    return { cart: [] };
+  }
 };
+
+const initialState = loadFromLocalStorage();
 
 const cartSlice = createSlice({
   name: 'cart',
@@ -11,7 +23,7 @@ const cartSlice = createSlice({
     addToCart: (state, action) => {
       const { id } = action.payload;
       const existingProductIndex = state.cart.findIndex(item => item.id === id);
-    
+
       console.log('Payload recebido:', action.payload);
       if (existingProductIndex !== -1) {
         console.log('Produto existente encontrado:', existingProductIndex);
@@ -24,7 +36,7 @@ const cartSlice = createSlice({
         console.log('Carrinho após incrementar a quantidade:', state.cart);
       } else {
         console.log('Novo produto adicionado:', action.payload);
-        state.cart = [...state.cart, { ...action.payload, quantity: 1 }]; // Corrigido aqui
+        state.cart = [...state.cart, { ...action.payload, quantity: 1 }];
         console.log('Carrinho após adicionar o novo produto:', state.cart);
       }
       console.log('Carrinho atualizado após adicionar ao carrinho:', state.cart);
@@ -35,11 +47,11 @@ const cartSlice = createSlice({
       if (product) {
         product.quantity = quantity;
       }
-      console.log('Carrinho atualizado após atualizar quantidade:', state.cart); // Adicionando log aqui
+      console.log('Carrinho atualizado após atualizar quantidade:', state.cart);
     },
     removeFromCart: (state, action) => {
       state.cart = state.cart.filter(item => item.id !== action.payload);
-      console.log('Carrinho atualizado após remover do carrinho:', state.cart); // Adicionando log aqui
+      console.log('Carrinho atualizado após remover do carrinho:', state.cart);
     },
   },
 });

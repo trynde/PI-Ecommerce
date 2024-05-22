@@ -1,33 +1,49 @@
+// src/components/NavBar.js
 import { useEffect, useState } from "react";
 import logo from '../../assets/logo.svg';
 import { Cart3, Person } from 'react-bootstrap-icons';
-import { Link } from "react-router-dom";
-import axios from "axios";
-import { useParams } from 'react-router-dom';
-import { useNavigate } from "react-router-dom";
-
+import { Link, useNavigate } from "react-router-dom";
+import { signOut } from "firebase/auth";
+import { auth } from "../firebaseConfig/firebaseConfig"; // firebaseConfig
+import useAuth from "../hooks/useAuth"; //hooks/useAuth
 
 export function NavBar() {
-    const { id } = useParams("");
+    const navigate = useNavigate();
+    const { user, loading } = useAuth();
 
+    const handleLogout = async () => {
+        await signOut(auth);
+        navigate('/login');
+    };
+
+    if (loading) {
+        return <div>Loading...</div>; // Adicione um indicador de carregamento, se necessário
+    }
 
     return (
-        <>
-            <header>
-                <div className="logo">
-                    <Link to="/">
-                        <img width="100px" height="60px" src={logo} alt="Logo" />
-                    </Link>
-                </div>
-                <nav>
-                    <ul>
-                        {/* Aqui você usa o estado `id` para criar a URL da página de perfil */}
-                        <li><Link to={`/Perfil/${id}`}><Person size={26} /></Link></li>
-                        <li><a href="/Carrinho"><Cart3 size={26} /></a></li>
-                        <li><a href="http://localhost:3000/">Sair</a></li>
-                    </ul>
-                </nav>
-            </header>
-        </>
+        <header>
+            <div className="logo">
+                <Link to="/">
+                    <img width="100px" height="60px" src={logo} alt="Logo" />
+                </Link>
+            </div>
+            <nav>
+                <ul>
+                    {user ? (
+                        <>
+                            <li><Link to={`/Perfil/${user.uid}`}><Person size={26} /></Link></li>
+                            <li><Link to="/Carrinho"><Cart3 size={26} /></Link></li>
+                            <li><button onClick={handleLogout}>Sair</button></li>
+                        </>
+                    ) : (
+                        <>
+                        <li><Link to="/login">Entrar</Link></li>
+                        <li><Link to="/Carrinho"><Cart3 size={26} /></Link></li>
+                        </>
+                        
+                    )}
+                </ul>
+            </nav>
+        </header>
     );
 }

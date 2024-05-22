@@ -59,7 +59,6 @@ export const Cart = () => {
                     <th>Produto</th>
                     <th>Quantidade</th>
                     <th>Preço</th>
-                    <th>Total</th>
                     <th>Ações</th>
                   </tr>
                 </thead>
@@ -72,7 +71,6 @@ export const Cart = () => {
                         {product.quantity}
                         <button onClick={() => handleQuantityChange(product.id, product.quantity + 1)}>+</button>
                       </td>
-                      <td>R${product.preco}</td>
                       <td>R${(product.preco * product.quantity).toFixed(2)}</td>
                       <td>
                         <button onClick={() => handleRemove(product.id)}>Remover</button>
