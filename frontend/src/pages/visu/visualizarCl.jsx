@@ -1,5 +1,5 @@
+import React, { useState, useEffect } from "react";
 import { NavBar } from "../../componentes/navbar2/navbar";
-import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import "./visualizar.css";
 import { useParams } from "react-router-dom";
@@ -9,14 +9,16 @@ import "swiper/css/pagination";
 import "./styles.css";
 import { Pagination } from "swiper/modules";
 import { useNavigate } from "react-router-dom";
-import { CartContext } from "../../componentes/contexts/CartContext";
+import { useDispatch } from 'react-redux';
+import { addToCart } from '../../componentes/contexts/cartSlice';
 
 export const VisualizarCL = () => {
   const navegar = useNavigate();
   const [images, setImages] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const { id } = useParams();
-  const { addToCart, cart } = useContext(CartContext);
+  const dispatch = useDispatch();
+
   const [productInfo, setProductInfo] = useState({
     nomeProduto: "",
     descricao: "",
@@ -68,6 +70,7 @@ export const VisualizarCL = () => {
   }, [id]);
 
   const handleBuy = () => {
+    console.log('Informações do produto:', productInfo);
     const product = {
       id,
       nomeProduto: productInfo.nomeProduto,
@@ -75,21 +78,14 @@ export const VisualizarCL = () => {
       preco: productInfo.preco,
       quantity: 1 // Definindo a quantidade inicial como 1 ao adicionar ao carrinho
     };
-    
+
     // Adiciona o produto ao carrinho
-    addToCart(product);
-  
-    // Verifica se o produto foi adicionado ao carrinho corretamente
-    if (cart.find(item => item.id === product.id)) {
-      // Produto adicionado com sucesso
-      alert("Produto adicionado ao carrinho com sucesso!");
-    } else {
-      // Produto não pôde ser adicionado
-      alert("Erro ao adicionar produto ao carrinho.");
-    }
+    dispatch(addToCart(product));
+
+    // Produto adicionado com sucesso
+    alert("Produto adicionado ao carrinho com sucesso!");
   };
-  
-  
+
   return (
     <>
       <NavBar />
