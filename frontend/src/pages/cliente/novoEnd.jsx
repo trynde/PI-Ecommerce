@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useForm } from "react-hook-form";
+import { NavBar } from '../../componentes/navbar3/navbar';
 import { useNavigate } from "react-router-dom";
 
 export function NovoEnd() {
@@ -39,6 +40,8 @@ export function NovoEnd() {
   };
 
   return (
+    <>
+    <NavBar></NavBar>
     <div>
       <h1 className='mt-3 mb-3 text-center'>Cadastrar um Novo Endereço</h1>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -59,6 +62,7 @@ export function NovoEnd() {
           {errors.cep && <span>CEP inválido</span>}
           {erroEndereco && <span>{erroEndereco}</span>}
         </div>
+        <br />
         <input
           className="form-control"
           type="text"
@@ -67,7 +71,6 @@ export function NovoEnd() {
           value={endereco.logradouro || ''}
           {...register("endereco")}
         />
-        <br />
         <input
           type="hidden"
           className="form-control"
@@ -123,8 +126,12 @@ export function NovoEnd() {
         </select>
         {errors.tipo && <span>Por favor, selecione o tipo de endereço</span>}
         <br />
+        <select style={{display:'none'}} className="form-select" aria-label="Default select example" id="situacao" {...register("situacao", { required: true })}>
+        <option value="ativo">Ativo</option>
+        </select>
         <button className="btn btn-dark" type="submit">Cadastrar</button>
       </form>
     </div>
+    </>
   );
 }

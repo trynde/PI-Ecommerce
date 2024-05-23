@@ -5,6 +5,7 @@ const path = require('path');
 const usuarioRotas = require('./routes/usuario')
 const produtoImagemRotas = require('./routes/produtoimagem')
 const clienteRotas = require("./routes/cliente")
+const compraRotas = require("./routes/compra")
 require("dotenv").config();
 
 const app = express();
@@ -16,6 +17,7 @@ app.use(cors());
 app.use(usuarioRotas)
 app.use(produtoImagemRotas)
 app.use(clienteRotas)
+app.use(compraRotas)
 app.listen(3005, () => {
     console.log("Servidor rodando em http://localhost:3005/");
 });

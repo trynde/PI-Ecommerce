@@ -13,7 +13,7 @@ CREATE TABLE usuarios (
 
     -- Criação da tabela 'produto'
 CREATE TABLE produto (
-  id SERIAL PRIMARY KEY,
+  id INT AUTO_INCREMENT PRIMARY KEY,
   nomeProduto VARCHAR(255) NOT NULL,
   avaliacao VARCHAR(255) NOT NULL,
   descricao VARCHAR(2000) NOT NULL,
@@ -24,9 +24,9 @@ CREATE TABLE produto (
 
 -- Criação da tabela 'imagemProduto'
 CREATE TABLE imagemProduto (
-  id INT AUTO_INCREMEN PRIMARY KEY,
+  id INT AUTO_INCREMENT PRIMARY KEY,
   nomeImagem VARCHAR(255) NOT NULL,
-  produtoId  VARCHAR(255),
+  produtoId  INT,
   FOREIGN KEY (produtoId) REFERENCES produto(id) ON DELETE CASCADE
 );
 
@@ -54,5 +54,7 @@ CREATE TABLE enderecoAlternativo (
     bairro VARCHAR(255) NOT NULL,
     cidade VARCHAR(255) NOT NULL,
     estado VARCHAR(255) NOT NULL,
+	tipo ENUM('principal', 'alternativo') NOT NULL,
+    situacao ENUM('ativo', 'inativo') NOT NULL,
     FOREIGN KEY (cliente_id) REFERENCES cliente(id) ON DELETE CASCADE
 );

@@ -15,7 +15,7 @@ export function NavBar() {
         <>
             <header>
                 <div className="logo">
-                    <Link to="/">
+                    <Link to="/principalC">
                         <img width="100px" height="60px" src={logo} alt="Logo" />
                     </Link>
                 </div>

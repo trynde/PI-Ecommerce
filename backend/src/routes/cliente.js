@@ -150,45 +150,89 @@ rotas.put('/editarCliente/:id', (req, res) => {
 
       const userPasswordHash = results[0].senha;
 
-      // Compara a senha fornecida com a senha armazenada no banco de dados
-      bcrypt.compare(senha, userPasswordHash, (compareErr, isMatch) => {
-          if (compareErr) {
-              console.error('Erro ao comparar senhas:', compareErr);
-              return res.status(500).json({ mensagem: 'Ocorreu um erro ao comparar as senhas' });
+      // Função para atualizar os dados do usuário no banco de dados
+      const updateUser = (hashedPassword) => {
+          let fields = [];
+          let values = [];
+
+          if (nome) {
+              fields.push('nome = ?');
+              values.push(nome);
+          }
+          if (data_nascimento) {
+              fields.push('data_nascimento = ?');
+              values.push(data_nascimento);
+          }
+          if (genero) {
+              fields.push('genero = ?');
+              values.push(genero);
+          }
+          if (email) {
+              fields.push('email = ?');
+              values.push(email);
+          }
+          if (cpf) {
+              fields.push('cpf = ?');
+              values.push(cpf);
+          }
+          if (senha && hashedPassword) {
+              fields.push('senha = ?');
+              values.push(hashedPassword);
           }
 
-          if (isMatch) {
-              // Senha fornecida é igual à senha do usuário no banco de dados, retornar erro
-              return res.status(400).json({ mensagem: 'A nova senha deve ser diferente da senha atual' });
+          values.push(userId);
+
+          if (fields.length === 0) {
+              return res.status(400).json({ mensagem: 'Nenhum campo para atualizar' });
           }
 
-          // As senhas não são iguais, prosseguir com a atualização
-          // Hash da nova senha
-          bcrypt.hash(senha, 10, (hashErr, hashedPassword) => {
-              if (hashErr) {
-                  console.error('Erro ao gerar hash da senha:', hashErr);
-                  return res.status(500).json({ mensagem: 'Ocorreu um erro ao atualizar a senha' });
+          const queryUpdate = `UPDATE cliente SET ${fields.join(', ')} WHERE id = ?`;
+          connection.query(queryUpdate, values, (updateErr, result) => {
+              if (updateErr) {
+                  console.error('Erro ao atualizar usuário:', updateErr);
+                  return res.status(500).json({ mensagem: 'Ocorreu um erro ao atualizar o usuário' });
+              }
+              res.status(200).json({ mensagem: 'Usuário atualizado com sucesso' });
+          });
+      };
+
+      if (senha) {
+          // Compara a senha fornecida com a senha armazenada no banco de dados
+          bcrypt.compare(senha, userPasswordHash, (compareErr, isMatch) => {
+              if (compareErr) {
+                  console.error('Erro ao comparar senhas:', compareErr);
+                  return res.status(500).json({ mensagem: 'Ocorreu um erro ao comparar as senhas' });
               }
 
-              // Atualiza os dados do usuário no banco de dados
-              const queryUpdate = `UPDATE cliente SET nome = ?, data_nascimento = ?, genero = ?, email = ?, cpf = ?, senha = ? WHERE id = ?`;
-              connection.query(queryUpdate, [nome, data_nascimento, genero, email, cpf, senha], (updateErr, result) => {
-                  if (updateErr) {
-                      console.error('Erro ao atualizar usuário:', updateErr);
-                      return res.status(500).json({ mensagem: 'Ocorreu um erro ao atualizar o usuário' });
+              if (isMatch) {
+                  // Senha fornecida é igual à senha do usuário no banco de dados, retornar erro
+                  return res.status(400).json({ mensagem: 'A nova senha deve ser diferente da senha atual' });
+              }
+
+              // As senhas não são iguais, prosseguir com a atualização
+              // Hash da nova senha
+              bcrypt.hash(senha, 10, (hashErr, hashedPassword) => {
+                  if (hashErr) {
+                      console.error('Erro ao gerar hash da senha:', hashErr);
+                      return res.status(500).json({ mensagem: 'Ocorreu um erro ao atualizar a senha' });
                   }
-                  res.status(200).json({ mensagem: 'Usuário atualizado com sucesso' });
+
+                  // Chama a função para atualizar o usuário com a nova senha hash
+                  updateUser(hashedPassword);
               });
           });
-      });
+      } else {
+          // Senha não está sendo atualizada, chama a função para atualizar o usuário sem alterar a senha
+          updateUser(null);
+      }
   });
 });
 
 rotas.post('/endereco', async (req, res) => {
-  const { cliente_id, endereco, numero, bairro, cidade, estado, tipo } = req.body;
+  const { cliente_id, endereco, numero, bairro, cidade, estado, tipo, situacao } = req.body;
 
-  const query = 'INSERT INTO enderecoAlternativo (cliente_id, endereco, numero, bairro, cidade, estado, tipo) VALUES (?, ?, ?, ?, ?, ?, ?)';
-  const values = [cliente_id, endereco, numero, bairro, cidade, estado, tipo];
+  const query = 'INSERT INTO enderecoAlternativo (cliente_id, endereco, numero, bairro, cidade, estado, tipo, situacao) VALUES (?, ?, ?, ?, ?, ?, ?,?)';
+  const values = [cliente_id, endereco, numero, bairro, cidade, estado, tipo, situacao];
 
   connection.query(query, values, (err, result) => {
     if (err) {
@@ -202,6 +246,59 @@ rotas.post('/endereco', async (req, res) => {
   
 });
 
+rotas.get('/enderecos/:cliente_id', (req, res) => {
+  const { cliente_id } = req.params;
+
+  const queryGetEnderecos = `
+      SELECT 
+          endereco, 
+          numero, 
+          bairro, 
+          cidade, 
+          estado, 
+          tipo, 
+          situacao 
+      FROM 
+          enderecoAlternativo 
+      WHERE 
+          cliente_id = ?`;
+
+  connection.query(queryGetEnderecos, [cliente_id], (err, results) => {
+      if (err) {
+          console.error('Erro ao consultar endereços alternativos:', err);
+          return res.status(500).json({ mensagem: 'Ocorreu um erro ao consultar os endereços alternativos' });
+      }
+
+      if (results.length === 0) {
+          return res.status(404).json({ mensagem: 'Nenhum endereço alternativo encontrado' });
+      }
+
+      res.status(200).json(results);
+  });
+});
+
+rotas.put('/endereco/:id/situacao', async (req, res) => {
+  const { id } = req.params;
+  const { situacao } = req.body;
+
+  // Verificar se a situação fornecida é válida
+  if (!situacao) {
+      return res.status(400).json({ mensagem: "A situação não foi fornecida." });
+  }
+
+  // Atualizar a situação do usuário no banco de dados
+  connection.query('UPDATE enderecoAlternativo SET situacao = ? WHERE id = ?', [situacao, id], (error, results) => {
+      if (error) {
+          console.error('Erro ao atualizar situação:', error);
+          return res.status(500).json({ mensagem: 'Erro ao atualizar situação.' });
+      }
+      if (results.affectedRows === 0) {
+          return res.status(404).json({ mensagem: 'Usuário não encontrado.' });
+      }
+      console.log('Situação atualizada com sucesso.');
+      res.status(200).json({ mensagem: 'Situação atualizada com sucesso.' });
+  });
+});
 
 
   module.exports = rotas
