@@ -45,7 +45,6 @@ export function Perfil() {
         
         <div className='info'>
           <h1 className='mt-3 mb-3 text-center'>Perfil de {cliente.nome}</h1>
-          <p><b>Data de Nascimento: </b>{cliente.data_nascimento}</p>
           <p><b>Genero: </b>{cliente.genero}</p>
           <p><b>Email: </b>{cliente.email}</p>
           <p><b>Endereço: </b>{cliente.endereco}</p>

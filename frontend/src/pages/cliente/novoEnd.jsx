@@ -3,10 +3,8 @@ import axios from 'axios';
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 
-
 export function NovoEnd() {
-    const navegar = useNavigate();
-  const [cep, setCep] = useState('');
+  const navegar = useNavigate();
   const [endereco, setEndereco] = useState({
     logradouro: '',
     complemento: '',
@@ -15,61 +13,118 @@ export function NovoEnd() {
     uf: ''
   });
   const [erroEndereco, setErroEndereco] = useState('');
-  const [sucessoCadastro, setSucessoCadastro] = useState(false);
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-} = useForm();
+  const { register, handleSubmit, formState: { errors } } = useForm();
+  const id = localStorage.id
 
   const buscarCEP = (cep) => {
     axios.get(`https://viacep.com.br/ws/${cep}/json/`)
-        .then(response => {
-            setEndereco(response.data);
-        })
-        .catch(error => {
-            setErroEndereco('CEP não encontrado');
-        });
-};
+      .then(response => {
+        setEndereco(response.data);
+      })
+      .catch(error => {
+        setErroEndereco('CEP não encontrado');
+      });
+  };
 
-function onSubmit(dados) {
-    delete dados.confirmar;
-    axios.post('http://localhost:3005/endereco', dados)
-        .then((resposta) => {
-            navegar('/');
-        })
-        .catch((error) => alert(error.response.data.mensagem));
-}
+  const onSubmit = (data) => {
+    axios.post('http://localhost:3005/endereco', data)
+      .then((resposta) => {
+        console.log('Endereço adicionado com sucesso:', resposta.data);
+        navegar(`/Perfil/${id}`);
+      })
+      .catch((error) => {
+        console.error('Erro ao adicionar endereço:', error);
+        alert('Erro ao adicionar endereço. Por favor, tente novamente.');
+      });
+  };
 
   return (
     <div>
-      <h1 className='mt-3 mb-3 text-center'> Cadastrar um Novo Endereço</h1>
+      <h1 className='mt-3 mb-3 text-center'>Cadastrar um Novo Endereço</h1>
       <form onSubmit={handleSubmit(onSubmit)}>
+        
         <div>
-      <input className="form-control" type="text" name="CEP" placeholder="CEP" maxLength="9" {...register("cep", { 
-                            required: true,
-                            pattern: /^[0-9]{5}-?[0-9]{3}$/i,
-                        })} onBlur={(e) => buscarCEP(e.target.value)} />
-                        {errors.cep && <span>CEP inválido</span>}
-                        {erroEndereco && <span>{erroEndereco}</span>}
-                    </div>
-                    <br />
-                    <input className="form-control" type="text" name="Endereco" placeholder="Endereço" value={endereco.logradouro || ''} {...register("endereco")} />
-                    <br />
-                    <input className="form-control" type="text" name="Numero" placeholder="Numero da casa" {...register("numero", { required: true })} />
-                    <br />
-                    <input className="form-control" type="text" name="Bairro" placeholder="Bairro" value={endereco.bairro || ''} {...register("bairro")} />
-                    <br />
-                    <input className="form-control" type="text" name="Cidade" placeholder="Cidade" value={endereco.localidade || ''} {...register("cidade")} />
-                    <br />
-                    <input className="form-control" type="text" name="Estado" placeholder="Estado" value={endereco.uf || ''} {...register("estado")} />
-                    <br />
-                    <button className="btn btn-dark" type="submit">Cadastrar</button>
-                    </form>
-      </div>
-      
+          <input
+            className="form-control"
+            type="text"
+            name="CEP"
+            placeholder="CEP"
+            maxLength="9"
+            {...register("cep", { 
+              required: true,
+              pattern: /^[0-9]{5}-?[0-9]{3}$/i,
+            })}
+            onBlur={(e) => buscarCEP(e.target.value)}
+          />
+          {errors.cep && <span>CEP inválido</span>}
+          {erroEndereco && <span>{erroEndereco}</span>}
+        </div>
+        <input
+          className="form-control"
+          type="text"
+          name="Endereco"
+          placeholder="Endereço"
+          value={endereco.logradouro || ''}
+          {...register("endereco")}
+        />
+        <br />
+        <input
+          type="hidden"
+          className="form-control"
+          name="Cliente"
+          placeholder="Cliente"
+          value={id || ''}
+          {...register("cliente_id")}
+        />
+        <br />
+        <input
+          className="form-control"
+          type="text"
+          name="Numero"
+          placeholder="Número da casa"
+          {...register("numero", { required: true })}
+        />
+        <br />
+        <input
+          className="form-control"
+          type="text"
+          name="Bairro"
+          placeholder="Bairro"
+          value={endereco.bairro || ''}
+          {...register("bairro")}
+        />
+        <br />
+        <input
+          className="form-control"
+          type="text"
+          name="Cidade"
+          placeholder="Cidade"
+          value={endereco.localidade || ''}
+          {...register("cidade")}
+        />
+        <br />
+        <input
+          className="form-control"
+          type="text"
+          name="Estado"
+          placeholder="Estado"
+          value={endereco.uf || ''}
+          {...register("estado")}
+        />
+        <br />
+        <select
+          className="form-control"
+          name="Tipo"
+          {...register("tipo", { required: true })}
+        >
+          <option value="">Selecione o Tipo</option>
+          <option value="Principal">Principal</option>
+          <option value="Alternativo">Alternativo</option>
+        </select>
+        {errors.tipo && <span>Por favor, selecione o tipo de endereço</span>}
+        <br />
+        <button className="btn btn-dark" type="submit">Cadastrar</button>
+      </form>
+    </div>
   );
 }
-
-

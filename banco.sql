@@ -46,7 +46,7 @@ CREATE TABLE cliente (
     cep VARCHAR(10) NOT NULL
 );
 
-CREATE TABLE endereco_alternativo (
+CREATE TABLE enderecoAlternativo (
     id INT AUTO_INCREMENT PRIMARY KEY,
     cliente_id INT,
     endereco VARCHAR(255) NOT NULL,
@@ -54,5 +54,5 @@ CREATE TABLE endereco_alternativo (
     bairro VARCHAR(255) NOT NULL,
     cidade VARCHAR(255) NOT NULL,
     estado VARCHAR(255) NOT NULL,
-    FOREIGN KEY (cliente_id) REFERENCES cliente(id)
+    FOREIGN KEY (cliente_id) REFERENCES cliente(id) ON DELETE CASCADE
 );

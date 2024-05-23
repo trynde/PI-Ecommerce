@@ -185,19 +185,21 @@ rotas.put('/editarCliente/:id', (req, res) => {
 });
 
 rotas.post('/endereco', async (req, res) => {
-  const { cliente_id, endereco, numero, bairro, cidade, estado } = req.body;
+  const { cliente_id, endereco, numero, bairro, cidade, estado, tipo } = req.body;
 
+  const query = 'INSERT INTO enderecoAlternativo (cliente_id, endereco, numero, bairro, cidade, estado, tipo) VALUES (?, ?, ?, ?, ?, ?, ?)';
+  const values = [cliente_id, endereco, numero, bairro, cidade, estado, tipo];
 
-  // Insere os dados na tabela enderecos
-  const query = 'INSERT INTO endereco_alternativo (cliente_id, endereco, numero, bairro, cidade, estado) VALUES (?, ?, ?, ?, ?, ?)';
-  connection.query(query, [cliente_id, endereco, numero, bairro, cidade, estado], (error, results) => {
-    if (error) {
-      console.error('Erro ao inserir dados:', error);
-      return res.status(500).json({ mensagem: 'Erro ao inserir dados.' });
+  connection.query(query, values, (err, result) => {
+    if (err) {
+      console.error('Erro ao adicionar endereço:', err);
+      res.status(500).send('Erro ao adicionar endereço');
+      return;
     }
-    console.log('Dados inseridos com sucesso:', results);
-    res.status(201).json({ mensagem: 'Dados inseridos com sucesso.' });
+    console.log('Novo endereço adicionado com sucesso');
+    res.status(201).send('Endereço adicionado com sucesso');
   });
+  
 });
 
 
