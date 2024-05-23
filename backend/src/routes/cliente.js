@@ -251,6 +251,7 @@ rotas.get('/enderecos/:cliente_id', (req, res) => {
 
   const queryGetEnderecos = `
       SELECT 
+          id,
           endereco, 
           numero, 
           bairro, 
@@ -262,6 +263,38 @@ rotas.get('/enderecos/:cliente_id', (req, res) => {
           enderecoAlternativo 
       WHERE 
           cliente_id = ?`;
+
+  connection.query(queryGetEnderecos, [cliente_id], (err, results) => {
+      if (err) {
+          console.error('Erro ao consultar endereços alternativos:', err);
+          return res.status(500).json({ mensagem: 'Ocorreu um erro ao consultar os endereços alternativos' });
+      }
+
+      if (results.length === 0) {
+          return res.status(404).json({ mensagem: 'Nenhum endereço alternativo encontrado' });
+      }
+
+      res.status(200).json(results);
+  });
+});
+
+rotas.get('/enderecosCompra/:cliente_id', (req, res) => {
+  const { cliente_id } = req.params;
+
+  const queryGetEnderecos = `
+      SELECT 
+          id,
+          endereco, 
+          numero, 
+          bairro, 
+          cidade, 
+          estado, 
+          tipo, 
+          situacao 
+      FROM 
+          enderecoAlternativo 
+      WHERE 
+          cliente_id = ? AND situacao = 'ativo';`;
 
   connection.query(queryGetEnderecos, [cliente_id], (err, results) => {
       if (err) {

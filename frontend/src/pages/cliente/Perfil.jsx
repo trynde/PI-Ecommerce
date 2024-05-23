@@ -7,7 +7,7 @@ import Button from 'react-bootstrap/Button';
 
 export function Perfil() {
   const navegar = useNavigate();
-  const { id } = useParams(); // Obtém o ID do cliente da rota
+  const { id } = useParams();
   const [cliente, setCliente] = useState();
   const [enderecos, setEnderecos] = useState([]);
   const [show, setShow] = useState(false);
@@ -15,12 +15,10 @@ export function Perfil() {
   const [situacao, setSituacao] = useState('');
 
   useEffect(() => {
-    // Função para buscar as informações do cliente do servidor
     const fetchClienteInfo = async () => {
       try {
         const response = await axios.get(`http://localhost:3005/BuscarClientes/${id}`);
         if (response.status === 200) {
-          console.log(response.data);
           setCliente(response.data);
         } else {
           console.error("Erro ao buscar informações do cliente:", response.statusText);
@@ -30,7 +28,6 @@ export function Perfil() {
       }
     };
 
-    // Função para buscar os endereços alternativos do cliente
     const fetchEnderecos = async () => {
       try {
         const response = await axios.get(`http://localhost:3005/enderecos/${id}`);
@@ -44,34 +41,47 @@ export function Perfil() {
       }
     };
 
-    fetchClienteInfo(); // Chama a função de busca de informações do cliente ao montar o componente
-    fetchEnderecos();   // Chama a função de busca dos endereços do cliente ao montar o componente
+    fetchClienteInfo();
+    fetchEnderecos();
   }, [id]);
 
-  const handleClose = () => {
-    setEnderecoId(null);
-    setSituacao(null);
-    setShow(false);
+  const handleToggleSituacao = (id, situacao) => {
+    if (situacao === 'ativo') {
+      inativarEndereco(id);
+    } else if (situacao === 'inativo') {
+      ativarEndereco(id);
+    }
   };
 
-  const handleShow = (id, situacao) => {
-    setEnderecoId(id);
-    setSituacao(situacao);
-    setShow(true);
+  const handleClose = () => {
+    setShow(false);
   };
 
   const inativarEndereco = (id) => {
     const novaSituacao = 'inativo';
     axios.put(`http://localhost:3005/endereco/${id}/situacao`, { situacao: novaSituacao })
       .then(res => {
-        // Atualizar a lista de endereços
-        setEnderecos(enderecos.map(endereco => 
+        setEnderecos(enderecos.map(endereco =>
           endereco.id === id ? { ...endereco, situacao: novaSituacao } : endereco
         ));
         handleClose();
       })
       .catch(err => {
         console.error("Erro ao inativar endereço:", err);
+      });
+  };
+
+  const ativarEndereco = (id) => {
+    const novaSituacao = 'ativo';
+    axios.put(`http://localhost:3005/endereco/${id}/situacao`, { situacao: novaSituacao })
+      .then(res => {
+        setEnderecos(enderecos.map(endereco =>
+          endereco.id === id ? { ...endereco, situacao: novaSituacao } : endereco
+        ));
+        handleClose();
+      })
+      .catch(err => {
+        console.error("Erro ao ativar endereço:", err);
       });
   };
 
@@ -92,7 +102,6 @@ export function Perfil() {
             <br />
             <button onClick={() => navegar(`/NovoEnd/${id}`)} className="btn btn-dark">Adicionar endereço</button>
             
-            {/* Tabela de Endereços Alternativos */}
             <h2 className='mt-4'>Endereços Alternativos</h2>
             <table className="table">
               <thead>
@@ -104,27 +113,18 @@ export function Perfil() {
                   <th>Estado</th>
                   <th>Tipo</th>
                   <th>Situação</th>
-                  <th>Ações</th>
                 </tr>
               </thead>
               <tbody>
                 {enderecos.map((endereco) => (
-                  <tr key={endereco.id}>
+                  <tr key={endereco.id} onClick={() => handleToggleSituacao(endereco.id, endereco.situacao)}>
                     <td>{endereco.endereco}</td>
                     <td>{endereco.numero}</td>
                     <td>{endereco.bairro}</td>
                     <td>{endereco.cidade}</td>
                     <td>{endereco.estado}</td>
                     <td>{endereco.tipo}</td>
-                    <td>{endereco.situacao}</td>
-                    <td>
-                      <button
-                        className="btn btn-danger"
-                        onClick={() => inativarEndereco(endereco.id)}
-                      >
-                        Inativar
-                      </button>
-                    </td>
+                    <td className={endereco.situacao === 'ativo' ? 'text-success' : 'text-danger'}>{endereco.situacao}</td>
                   </tr>
                 ))}
               </tbody>
@@ -134,22 +134,6 @@ export function Perfil() {
           <p>Carregando...</p>
         )}
       </div>
-
-      {/* Modal para confirmação de inativação de endereço */}
-      <Modal show={show} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Confirmação</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>Deseja inativar o endereço?</Modal.Body>
-        <Modal.Footer>
-          <Button variant="danger" onClick={handleClose}>
-            Cancelar
-          </Button>
-          <Button variant="primary" onClick={() => inativarEndereco(enderecoId)}>
-            Confirmar
-          </Button>
-        </Modal.Footer>
-      </Modal>
     </>
   );
 }
