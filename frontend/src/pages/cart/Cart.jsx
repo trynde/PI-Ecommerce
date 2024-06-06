@@ -81,6 +81,7 @@ export const Cart = () => {
         formaPagamento,
         numeroCartao,
         codigoVerificador,
+        nomesProdutos,
         nomeCompleto,
         dataVencimento,
         quantidadeParcelas,
@@ -95,6 +96,9 @@ export const Cart = () => {
         localStorage.setItem('compra', JSON.stringify(compra));
         console.log('Pedido final validado e armazenado no localStorage. Prosseguindo para a próxima etapa.');
         alert(`Compra finalizada Protocolo: ${protocolo}`);
+        // Após a finalização da compra com sucesso
+        localStorage.setItem('detalhesCompra', JSON.stringify(compra));
+
       } catch (error) {
         console.error('Erro ao finalizar compra:', error);
         alert('Você precisa estar logado.');
