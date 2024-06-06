@@ -23,6 +23,7 @@ import { NovoEnd } from './pages/cliente/novoEnd';
 import { Cart } from './pages/cart/Cart';
 import { StatusCompra } from './pages/estoque/estadodopedido';
 import { DetalheCompra } from './pages/cliente/detlheCompra';
+import { Alterar } from './pages/estoque/alterarStatus';
 
 function App() {
   return (
@@ -49,7 +50,8 @@ function App() {
         <Route path='/VisualizarCL/:id' element={<VisualizarCL />} />
         <Route path="/Carrinho" element={<Cart />} />
         <Route path="/CompraStatus" element={<StatusCompra/>}/>
-        <Route path="/Detalhe" element={<DetalheCompra/>}/>
+        <Route path="/Detalhe/:id" element={<DetalheCompra/>}/>
+        <Route path="/AlterarComrpa" element={<Alterar/>}></Route>
       </Routes>
     </BrowserRouter>
   </Provider>

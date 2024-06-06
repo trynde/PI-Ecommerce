@@ -68,17 +68,16 @@ export const Cart = () => {
   };
 
   const generateProtocolo = () => {
-    return Math.floor(Math.random() * 1000000000); // Generate a random 9-digit number
+    return Math.floor(Math.random() * 1000000000); // Gera um número aleatório de 9 dígitos
   };
 
-  const handleFinalizarCompra = () => {
+  const handleFinalizarCompra = async () => {
     if (formaPagamento === 'boleto' || (formaPagamento === 'cartao' && numeroCartao && codigoVerificador && nomeCompleto && dataVencimento && quantidadeParcelas > 0)) {
       const protocolo = generateProtocolo();
       const nomesProdutos = cart.map(product => product.nomeProduto);
       const compra = {
-        cart,
-        nomesProdutos,
-        enderecoSelecionado,
+        cliente_id: localStorage.getItem('id'),
+        endereco_id: enderecoSelecionado,
         formaPagamento,
         numeroCartao,
         codigoVerificador,
@@ -88,16 +87,36 @@ export const Cart = () => {
         frete,
         total: calcularTotal(),
         protocolo,
-        status: setStatus("Aguardando Pagamento")
+        situacao: "Aguardando Pagamento"
       };
       
-      localStorage.setItem('compra', JSON.stringify(compra));
-      setStatus("Aguardando Pagamento");
-      console.log('Pedido final validado e armazenado no localStorage. Prosseguindo para a próxima etapa.');
-      alert(`Compra finalizada Protocolo: ${protocolo}`);
+      try {
+        await axios.post('http://localhost:3005/ComprasF', compra);
+        localStorage.setItem('compra', JSON.stringify(compra));
+        console.log('Pedido final validado e armazenado no localStorage. Prosseguindo para a próxima etapa.');
+        alert(`Compra finalizada Protocolo: ${protocolo}`);
+      } catch (error) {
+        console.error('Erro ao finalizar compra:', error);
+        alert('Você precisa estar logado.');
+        navigate("/Entrar")
+      }
   
     } else {
       console.error('Por favor, selecione uma forma de pagamento e preencha os campos obrigatórios.');
+      alert('Por favor, selecione uma forma de pagamento e preencha os campos obrigatórios.');
+    }
+  };
+
+  const handleAdicionarAoCarrinho = async (produto) => {
+    const { id, nomeProduto, preco } = produto;
+    const cliente_id = localStorage.getItem('id');
+
+    try {
+      await axios.post('http://localhost:3005/cartItems', { cliente_id, produto_id: id, nomeProduto, preco, quantidade: 1 });
+      dispatch(updateQuantity({ id, quantity: 1 }));
+    } catch (error) {
+      console.error('Erro ao adicionar item ao carrinho:', error);
+      alert('Erro ao adicionar item ao carrinho. Por favor, tente novamente.');
     }
   };
 
@@ -124,7 +143,7 @@ export const Cart = () => {
                     <tr key={product.id}>
                       <td>{product.nomeProduto}</td>
                       <td>
-                        <button onClick={() => handleQuantityChange(product.id, product.quantity - 1)}>-</button>
+                        <button onClick={() => handleQuantityChange(product.id, product.quantity - 1)} disabled={product.quantity <= 1}>-</button>
                         {product.quantity}
                         <button onClick={() => handleQuantityChange(product.id, product.quantity + 1)}>+</button>
                       </td>
@@ -206,7 +225,7 @@ export const Cart = () => {
                 />
                 <input
                   type="text"
-                  placeholder="Data de Vencimento"
+                  placeholder="Data de Vencimento (MM/AA)"
                   value={dataVencimento}
                   onChange={(e) => setDataVencimento(e.target.value)}
                 />
@@ -246,3 +265,4 @@ export const Cart = () => {
   );
 };
 
+export default Cart;

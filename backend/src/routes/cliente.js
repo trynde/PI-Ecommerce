@@ -365,5 +365,167 @@ rotas.post('/api/saveCompra', (req, res) => {
     });
 });
 
+rotas.post('/ComprasF', (req, res) => {
+    const { cliente_id, endereco_id, formaPagamento, numeroCartao, codigoVerificador, nomeCompleto, dataVencimento, quantidadeParcelas, frete, total, protocolo, situacao } = req.body;
   
+    const query = 'INSERT INTO comprasteste (cliente_id, endereco_id, formaPagamento, numeroCartao, codigoVerificador, nomeCompleto, dataVencimento, quantidadeParcelas, frete, total, protocolo, situacao) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+    const values = [cliente_id, endereco_id, formaPagamento, numeroCartao, codigoVerificador, nomeCompleto, dataVencimento, quantidadeParcelas, frete, total, protocolo, situacao];
+  
+    connection.query(query, values, (err, result) => {
+      if (err) {
+        console.error('Erro ao adicionar compra:', err);
+        res.status(500).send('Erro ao adicionar compra');
+        return;
+      }
+      console.log('Compra adicionada com sucesso');
+      res.status(201).send('Compra adicionada com sucesso');
+    });
+  });
+  
+  rotas.get('/compras/:cliente_id', (req, res) => {
+    const { cliente_id } = req.params;
+  
+    connection.query('SELECT * FROM comprasteste WHERE cliente_id = ?', [cliente_id], (err, results) => {
+      if (err) {
+        console.error('Erro ao buscar compras:', err);
+        res.status(500).json({ mensagem: 'Erro ao buscar compras' });
+        return;
+      }
+      if (results.length === 0) {
+        res.status(404).json({ mensagem: 'Nenhuma compra encontrada' });
+        return;
+      }
+      res.status(200).json(results);
+    });
+  });
+  
+  // Rotas para a tabela CartItems
+  rotas.post('/cartItems', (req, res) => {
+    const { cliente_id, produto_id, nomeProduto, preco, quantidade } = req.body;
+  
+    // Primeiro, execute uma consulta para obter o compra_id da tabela compras
+    const getCompraIdQuery = 'SELECT id FROM comprasteste WHERE cliente_id = ?';
+    connection.query(getCompraIdQuery, [cliente_id], (err, results) => {
+        if (err) {
+            console.error('Erro ao obter o compra_id:', err);
+            res.status(500).send('Erro ao obter o compra_id');
+            return;
+        }
+
+        if (results.length === 0) {
+            console.error('Nenhuma compra encontrada para o cliente');
+            res.status(404).send('Nenhuma compra encontrada para o cliente');
+            return;
+        }
+
+        const compra_id = results[0].id;
+
+        // Agora que temos o compra_id, podemos inserir o item no carrinho (cartitems)
+        const insertCartItemQuery = 'INSERT INTO cartitems (cliente_id, produto_id, compra_id, nomeProduto, preco, quantidade) VALUES (?, ?, ?, ?, ?, ?)';
+        const values = [cliente_id, produto_id, compra_id, nomeProduto, preco, quantidade];
+      
+        connection.query(insertCartItemQuery, values, (err, result) => {
+            if (err) {
+                console.error('Erro ao adicionar item ao carrinho:', err);
+                res.status(500).send('Erro ao adicionar item ao carrinho');
+                return;
+            }
+            console.log('Item adicionado ao carrinho com sucesso');
+            res.status(201).send('Item adicionado ao carrinho com sucesso');
+        });
+    });
+});
+
+
+  
+rotas.get('/cartItems/:id', (req, res) => {
+  const { id } = req.params;
+
+  connection.query('SELECT * FROM cartitems WHERE id = ?', [id], (err, results) => {
+    if (err) {
+      console.error('Erro ao buscar itens do carrinho:', err);
+      res.status(500).json({ mensagem: 'Erro ao buscar itens do carrinho' });
+      return;
+    }
+    if (results.length === 0) {
+      res.status(404).json({ mensagem: 'Nenhum item do carrinho encontrado' });
+      return;
+    }
+
+    // Supondo que os campos da tabela cartitems sejam: id, protocolo, formaPagamento, total, enderecoSelecionado, nomeProduto
+    const compra = {
+      protocolo: results[0].protocolo,
+      formaPagamento: results[0].formaPagamento,
+      total: results[0].preco,
+      enderecoSelecionado: results[0].enderecoSelecionado,
+      itens: results.map(item => ({
+        nomeProduto: item.nomeProduto
+      }))
+    };
+
+    res.status(200).json(compra);
+  });
+});
+
+rotas.post('/ComprasF', (req, res) => {
+  const { cliente_id, endereco_id, formaPagamento, numeroCartao, codigoVerificador, nomeCompleto, dataVencimento, quantidadeParcelas, frete, total, protocolo, situacao } = req.body;
+
+  const query = `
+    INSERT INTO cartitems (cliente_id, endereco_id, formaPagamento, numeroCartao, codigoVerificador, nomeCompleto, dataVencimento, quantidadeParcelas, frete, total, protocolo, situacao)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  connection.query(query, [cliente_id, endereco_id, formaPagamento, numeroCartao, codigoVerificador, nomeCompleto, dataVencimento, quantidadeParcelas, frete, total, protocolo, situacao], (err, result) => {
+    if (err) {
+      console.error('Erro ao salvar compra:', err);
+      res.status(500).json({ mensagem: 'Erro ao salvar compra' });
+      return;
+    }
+    // Retornar o ID da compra recém-criada
+    res.status(201).json({ compra_id: result.insertId });
+  });
+});
+
+
+
+
+  rotas.get('/compras', (req, res) => {
+  
+    connection.query('SELECT * FROM comprasteste', (err, results) => {
+      if (err) {
+        console.error('Erro ao buscar compras:', err);
+        res.status(500).json({ mensagem: 'Erro ao buscar compras' });
+        return;
+      }
+      if (results.length === 0) {
+        res.status(404).json({ mensagem: 'Nenhuma compra encontrada' });
+        return;
+      }
+      res.status(200).json(results);
+    });
+  });
+  
+
+  rotas.put('/compras/:id/situacao', (req, res) => {
+    const { id } = req.params;
+    const { situacao } = req.body;
+  
+    // Verificar se a situação fornecida é válida
+    if (!situacao) {
+      return res.status(400).json({ mensagem: "A situação não foi fornecida." });
+    }
+  
+    // Atualizar a situação da compra no banco de dados
+    connection.query('UPDATE comprasteste SET situacao = ? WHERE id = ?', [situacao, id], (error, results) => {
+      if (error) {
+        console.error('Erro ao atualizar situação da compra:', error);
+        return res.status(500).json({ mensagem: 'Erro ao atualizar situação da compra.' });
+      }
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ mensagem: 'Compra não encontrada.' });
+      }
+      console.log('Situação da compra atualizada com sucesso.');
+      res.status(200).json({ mensagem: 'Situação da compra atualizada com sucesso.' });
+    });
+  });
 module.exports = rotas
