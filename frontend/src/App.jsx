@@ -17,9 +17,12 @@ import { LoginU } from './pages/login/loginU';
 import { CadastrarCli } from './pages/cadastro/cadastroC';
 import { PrincipalC } from './pages/principal/principalC';
 import { Perfil } from './pages/cliente/Perfil';
+import { MinhasCompras } from './pages/cliente/MinhasCompras';
 import { EditarCliente } from './pages/cliente/editarPerfil';
 import { NovoEnd } from './pages/cliente/novoEnd';
 import { Cart } from './pages/cart/Cart';
+import { StatusCompra } from './pages/estoque/estadodopedido';
+import { DetalheCompra } from './pages/cliente/detlheCompra';
 
 function App() {
   return (
@@ -32,6 +35,7 @@ function App() {
         <Route path='/' element={<Principal />} />
         <Route path='/NovoEnd/:id' element={<NovoEnd />} />
         <Route path='/Perfil/:id' element={<Perfil />} />
+        <Route path='/MinhasCompras' element={<MinhasCompras />} />
         <Route path='/principalC' element={<PrincipalC />} />
         <Route path='/principalAE' element={<PrincipalAE/>}/>
         <Route path='/Cadastrar' element={<Cadastrar />} />
@@ -44,6 +48,8 @@ function App() {
         <Route path='/Visualizar/:id' element={<Visualizar />} />
         <Route path='/VisualizarCL/:id' element={<VisualizarCL />} />
         <Route path="/Carrinho" element={<Cart />} />
+        <Route path="/CompraStatus" element={<StatusCompra/>}/>
+        <Route path="/Detalhe" element={<DetalheCompra/>}/>
       </Routes>
     </BrowserRouter>
   </Provider>

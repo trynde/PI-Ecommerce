@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { NavBar } from '../../componentes/navbar3/navbar';
 import { useNavigate } from 'react-router-dom';
 import { updateQuantity, removeFromCart } from '../../componentes/contexts/cartSlice';
 import axios from 'axios';
@@ -11,24 +10,18 @@ export const Cart = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Estado para armazenar o valor do frete selecionado
+  const [status, setStatus] = useState("Aguardando Pagamento");
   const [frete, setFrete] = useState(0);
-  // Estado para armazenar os endereços do cliente
   const [enderecos, setEnderecos] = useState([]);
-  // Estado para armazenar o endereço selecionado
   const [enderecoSelecionado, setEnderecoSelecionado] = useState('');
-  // Estado para armazenar a forma de pagamento selecionada
   const [formaPagamento, setFormaPagamento] = useState('');
-  // Estado para os dados do cartão de crédito
   const [numeroCartao, setNumeroCartao] = useState('');
   const [codigoVerificador, setCodigoVerificador] = useState('');
   const [nomeCompleto, setNomeCompleto] = useState('');
   const [dataVencimento, setDataVencimento] = useState('');
   const [quantidadeParcelas, setQuantidadeParcelas] = useState(1);
 
-  // Função para calcular o total do carrinho, incluindo o frete
   const calcularTotal = () => {
-    // Se o carrinho estiver vazio, o total dos produtos é zero
     if (cart.length === 0) {
       return 0;
     }
@@ -38,16 +31,13 @@ export const Cart = () => {
   };
 
   useEffect(() => {
-    // Função para buscar os endereços do cliente
     const fetchEnderecos = async () => {
       try {
-        // Buscar o ID do cliente do localStorage
         const cliente_id = localStorage.getItem('id');
         console.log('ID do cliente:', cliente_id);
         const response = await axios.get(`http://localhost:3005/enderecosCompra/${cliente_id}`);
         console.log('Resposta da API:', response.data);
         setEnderecos(response.data);
-        // Se houver endereços disponíveis, defina o primeiro como selecionado
         if (response.data.length > 0) {
           setEnderecoSelecionado(response.data[0].id);
         }
@@ -77,11 +67,35 @@ export const Cart = () => {
     setFormaPagamento(e.target.value);
   };
 
+  const generateProtocolo = () => {
+    return Math.floor(Math.random() * 1000000000); // Generate a random 9-digit number
+  };
+
   const handleFinalizarCompra = () => {
-    // Lógica para finalizar a compra
     if (formaPagamento === 'boleto' || (formaPagamento === 'cartao' && numeroCartao && codigoVerificador && nomeCompleto && dataVencimento && quantidadeParcelas > 0)) {
-      console.log('Pedido final validado. Prosseguindo para a próxima etapa.');
-      // Aqui você pode fazer a transição para a próxima etapa, como validar o pedido
+      const protocolo = generateProtocolo();
+      const nomesProdutos = cart.map(product => product.nomeProduto);
+      const compra = {
+        cart,
+        nomesProdutos,
+        enderecoSelecionado,
+        formaPagamento,
+        numeroCartao,
+        codigoVerificador,
+        nomeCompleto,
+        dataVencimento,
+        quantidadeParcelas,
+        frete,
+        total: calcularTotal(),
+        protocolo,
+        status: setStatus("Aguardando Pagamento")
+      };
+      
+      localStorage.setItem('compra', JSON.stringify(compra));
+      setStatus("Aguardando Pagamento");
+      console.log('Pedido final validado e armazenado no localStorage. Prosseguindo para a próxima etapa.');
+      alert(`Compra finalizada Protocolo: ${protocolo}`);
+  
     } else {
       console.error('Por favor, selecione uma forma de pagamento e preencha os campos obrigatórios.');
     }
@@ -89,7 +103,6 @@ export const Cart = () => {
 
   return (
     <>
-      <NavBar />
       <div className="container">
         <div className="row">
           <div className="col-md-8">
@@ -115,7 +128,7 @@ export const Cart = () => {
                         {product.quantity}
                         <button onClick={() => handleQuantityChange(product.id, product.quantity + 1)}>+</button>
                       </td>
-                      <td>R${(product.preco)}</td>
+                      <td>R${product.preco}</td>
                       <td>
                         <button onClick={() => handleRemove(product.id)}>Remover</button>
                       </td>
@@ -124,7 +137,14 @@ export const Cart = () => {
                 </tbody>
               </table>
             )}
-            <button className="btn btn-dark" onClick={() => navigate('/')}>Voltar para a loja</button>
+            <button className="btn btn-dark" onClick={() => {
+              const id = localStorage.getItem('id');
+              if (id === null) {
+                navigate('/');
+              } else {
+                navigate('/principalC');
+              }
+            }}>Voltar para a loja</button>          
           </div>
           <div className="col-md-4">
             <div className="endereco">
@@ -174,7 +194,7 @@ export const Cart = () => {
                 />
                 <input
                   type="text"
-                  placeholder="Código Verificador"
+                  placeholder="Código Verificador (CVV)"
                   value={codigoVerificador}
                   onChange={(e) => setCodigoVerificador(e.target.value)}
                 />
@@ -191,12 +211,14 @@ export const Cart = () => {
                   onChange={(e) => setDataVencimento(e.target.value)}
                 />
                 <p>Quantidade de parcelas</p>
-                <input
-                  type="number"
-                  placeholder="Quantidade de Parcelas"
-                  value={quantidadeParcelas}
-                  onChange={(e) => setQuantidadeParcelas(Number(e.target.value))}
-                />
+                <select value={quantidadeParcelas} onChange={(e) => setQuantidadeParcelas(Number(e.target.value))}>
+                  <option value={1}>À vista</option>
+                  {[...Array(24).keys()].map((num) => (
+                    <option key={num + 1} value={num + 1}>
+                      {num + 1}x
+                    </option>
+                  ))}
+                </select>
               </div>
             )}
             <div className="frete">
@@ -224,4 +246,3 @@ export const Cart = () => {
   );
 };
 
-export default Cart;

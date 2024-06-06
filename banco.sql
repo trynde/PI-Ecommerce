@@ -73,16 +73,23 @@ CREATE TABLE `carrinho_produtos` (
     `quantidade` INT NOT NULL
 );
 
-CREATE TABLE `compra` (
-    `id` INT AUTO_INCREMENT PRIMARY KEY,
-    `status` ENUM('DADOS_PENDENTES', 'AGUARDANDO_PAGAMENTO', 'PAGO_COM_SUCESSO', 'PAGAMENTO_REJEITADO', 'AGUARDANDO_RETIRADA', 'EM_TRANSITO', 'ENTREGUE', 'CANCELADA', 'FINALIZADA') NOT NULL DEFAULT 'DADOS_PENDENTES',
-    `cliente_id` INT NOT NULL,
-    `carrinho_id` INT NOT NULL,
-    `endereco` VARCHAR(255) NULL,
-    `entregador` VARCHAR(255) NULL,
-    `tipo_pagamento` VARCHAR(255) NULL,
-    `parcelas` INT NULL,
-    `valor_parcelas` DECIMAL(10,2) NULL,
-    `valor_total` DECIMAL(10,2) NULL,
-    `pago_em` DATETIME(3) NULL
+CREATE TABLE compra (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    status ENUM('AGUARDANDO_PAGAMENTO', 'PAGO_COM_SUCESSO', 'AGUARDANDO_RETIRADA', 'EM_TRANSITO', 'ENTREGUE', 'CANCELADA', 'FINALIZADA') NOT NULL DEFAULT 'DADOS_PENDENTES',
+    cliente_id INT NOT NULL,
+    carrinho_id INT NOT NULL,
+    endereco VARCHAR(255) NULL,
+    tipo_pagamento VARCHAR(255) NULL,
+    parcelas INT NULL,
+    valor_parcelas DECIMAL(10,2) NULL,
+    valor_total DECIMAL(10,2) NULL,
+    pago_em DATETIME(3) NULL,
+    FOREIGN KEY (cliente_id) REFERENCES cliente(id)
 );
+
+CREATE TABLE compras (
+      id INTEGER PRIMARY KEY AUTO_INCREMENT,
+      protocolo VARCHAR(255),
+      total REAL,
+      frete REAL,
+      situacao VARCHAR(255));

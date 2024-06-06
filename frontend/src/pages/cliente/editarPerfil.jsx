@@ -1,5 +1,5 @@
 import axios from "axios";
-import { NavBar } from "../../componentes/navbar3/navbar";
+import { NavBar1 } from "../../componentes/navbar3/navbar1";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -82,7 +82,7 @@ export function EditarCliente() {
 
     return (
         <>
-            <NavBar />
+            <NavBar1 />
             <div className="container">
                 <h1 className='mt-3 mb-3 text-center'>Editar Perfil</h1>
                 <form onSubmit={handleSubmit(onSubmit)}>

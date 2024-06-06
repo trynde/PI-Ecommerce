@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
-import { NavBar } from '../../componentes/navbar3/navbar';
+import { NavBar1 } from '../../componentes/navbar3/navbar1';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 
@@ -87,7 +87,7 @@ export function Perfil() {
 
   return (
     <>
-      <NavBar />
+      <NavBar1 />
       <div className="profile">
         {cliente ? (
           <div className='info'>
@@ -101,6 +101,9 @@ export function Perfil() {
             <br />
             <br />
             <button onClick={() => navegar(`/NovoEnd/${id}`)} className="btn btn-dark">Adicionar endereço</button>
+            <br />
+            <br />
+            <button onClick={() => navegar(`/MinhasCompras`)} className="btn btn-dark">Minhas Compras</button>
             
             <h2 className='mt-4'>Endereços Alternativos</h2>
             <table className="table">

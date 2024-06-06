@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useForm } from "react-hook-form";
-import { NavBar } from '../../componentes/navbar3/navbar';
+import { NavBar1 } from '../../componentes/navbar3/navbar1';
 import { useNavigate } from "react-router-dom";
 
 export function NovoEnd() {
@@ -41,7 +41,7 @@ export function NovoEnd() {
 
   return (
     <>
-    <NavBar></NavBar>
+    <NavBar1></NavBar1>
     <div>
       <h1 className='mt-3 mb-3 text-center'>Cadastrar um Novo Endereço</h1>
       <form onSubmit={handleSubmit(onSubmit)}>

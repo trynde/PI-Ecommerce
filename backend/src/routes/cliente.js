@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 
+
 rotas.get("/cliente", async (req,res) => {
   connection.query('SELECT * FROM cliente', (err, result) =>  {
       res.send(result);
@@ -333,5 +334,36 @@ rotas.put('/endereco/:id/situacao', async (req, res) => {
   });
 });
 
+rotas.post('/api/saveCompra', (req, res) => {
+    const { compra } = req.body;
 
-  module.exports = rotas
+    const checkSql = 'SELECT COUNT(*) AS count FROM compras WHERE protocolo = ?';
+    const insertSql = 'INSERT INTO compras (protocolo, total, frete, situacao) VALUES (?, ?, ?, ?)';
+    const params = [compra.protocolo, compra.total, compra.frete, 'Aguardando Pagamento'];
+
+    // Verificar se já existe uma compra com o mesmo protocolo
+    connection.query(checkSql, [compra.protocolo], (err, results) => {
+        if (err) {
+            console.error('Erro ao verificar a compra:', err.message);
+            return res.status(500).json({ error: err.message });
+        }
+
+        if (results[0].count > 0) {
+            // Já existe uma compra com o mesmo protocolo
+            return res.status(409).json({ message: 'Compra já existe' });
+        }
+
+        // Se não existe, insere a nova compra
+        connection.query(insertSql, params, (err, result) => {
+            if (err) {
+                console.error('Erro ao salvar a compra:', err.message);
+                return res.status(500).json({ error: err.message });
+            }
+
+            res.status(200).json({ message: 'Compra salva com sucesso', id: result.insertId });
+        });
+    });
+});
+
+  
+module.exports = rotas

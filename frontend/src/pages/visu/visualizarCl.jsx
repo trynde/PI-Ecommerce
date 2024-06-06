@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { NavBar } from "../../componentes/navbar2/navbar";
+import { NavBar1 } from "../../componentes/navbar3/navbar1";
+import { NavBar } from '../../componentes/navbar2/navbar';
 import axios from "axios";
 import "./visualizar.css";
 import { useParams } from "react-router-dom";
@@ -18,12 +19,20 @@ export const VisualizarCL = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const { id } = useParams();
   const dispatch = useDispatch();
+  const [clientId, setClientId] = useState(0);
 
   const [productInfo, setProductInfo] = useState({
     nomeProduto: "",
     descricao: "",
     preco: "",
   });
+
+  useEffect(() => {
+    const storedClientId = localStorage.getItem('id');
+    if (storedClientId && storedClientId !== "0") {
+      setClientId(parseInt(storedClientId));
+    }
+  }, []);
 
   useEffect(() => {
     const fetchImage = async () => {
@@ -88,7 +97,7 @@ export const VisualizarCL = () => {
 
   return (
     <>
-      <NavBar />
+      {clientId === 0 ? <NavBar /> : <NavBar1 />}
       <div className="product-detail-page">
         <div className="product-images">
           <div className="carousel">

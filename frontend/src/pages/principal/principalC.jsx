@@ -1,4 +1,4 @@
-import { NavBar } from "../../componentes/navbar3/navbar";
+import { NavBar1 } from "../../componentes/navbar3/navbar1";
 import "./principal.css";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -64,7 +64,7 @@ export function PrincipalC() {
 
   return (
     <>
-    <NavBar/>
+    <NavBar1/>
 
         {productInfo === null ? (
           <h1>Carregando</h1>

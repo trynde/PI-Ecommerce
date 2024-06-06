@@ -19,6 +19,12 @@ export function NavBar() {
                             :
                             <li><a href="http://localhost:3000/Usuarios">Listar Usuários</a></li>
                         }
+
+                        {grupo === 'Administrador' ?
+                        <></>
+                        :
+                        <li><a href="http://localhost:3000/CompraStatus">Compras</a></li>
+                        }
                         
                         <li><a href="http://localhost:3000/Login">Sair</a></li>
                     </ul>
